@@ -21,7 +21,7 @@ public class AdminController {
 	private final AdminService adminService;
 
 	@PostMapping("/signup")
-	public ResponseEntity<AdminSignupResponse> signup(@Valid @RequestBody AdminSignupRequest requestDto) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(adminService.signup(requestDto));
+	public ResponseEntity<AdminSignupResponse> signup(@Valid @RequestBody AdminSignupRequest request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(adminService.signup(request));
 	}
 }
