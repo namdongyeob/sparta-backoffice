@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sparta.backoffice.admin.dto.AdminResponseDto;
-import com.sparta.backoffice.admin.dto.AdminSignupRequestDto;
+import com.sparta.backoffice.admin.dto.AdminSignupResponse;
+import com.sparta.backoffice.admin.dto.AdminSignupRequest;
 import com.sparta.backoffice.admin.service.AdminService;
 
 import jakarta.validation.Valid;
@@ -21,7 +21,7 @@ public class AdminController {
 	private final AdminService adminService;
 
 	@PostMapping("/signup")
-	public ResponseEntity<AdminResponseDto> signup(@Valid @RequestBody AdminSignupRequestDto requestDto){
+	public ResponseEntity<AdminSignupResponse> signup(@Valid @RequestBody AdminSignupRequest requestDto) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(adminService.signup(requestDto));
 	}
 }

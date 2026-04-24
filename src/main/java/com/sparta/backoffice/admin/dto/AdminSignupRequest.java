@@ -9,9 +9,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class AdminSignupRequestDto {
+@NoArgsConstructor
+public class AdminSignupRequest {
 	@NotBlank(message = "이름은 필수 입력 항목입니다.")
 	private String name;
 	@NotBlank(message = "이메일은 필수 입력 항목입니다.")
@@ -23,7 +25,7 @@ public class AdminSignupRequestDto {
 	@NotBlank(message = "전화번호는 필수 입력 항목입니다.")
 	@Pattern(regexp = "^010-\\d{4}-\\d{4}$", message = "전화번호 형식은 010-XXXX-XXXX여야 합니다.")
 	private String phoneNumber;
-	@NotNull(message = "역활 선택은 필수 입니다.")
+	@NotNull(message = "역할 선택은 필수 입니다.")
 	private AdminRole role;
 
 	public Admin toEntity(String encodedPassword) {

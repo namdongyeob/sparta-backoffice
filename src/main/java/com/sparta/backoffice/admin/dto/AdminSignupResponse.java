@@ -9,7 +9,7 @@ import com.sparta.backoffice.admin.enums.AdminStatus;
 import lombok.Getter;
 
 @Getter
-public class AdminResponseDto {
+public class AdminSignupResponse {
 	private final Long id;
 	private final String name;
 	private final String email;
@@ -17,7 +17,7 @@ public class AdminResponseDto {
 	private final AdminStatus status;
 	private final LocalDateTime createdAt;
 
-	private AdminResponseDto(Long id, String name, String email, AdminRole role, AdminStatus status,
+	private AdminSignupResponse(Long id, String name, String email, AdminRole role, AdminStatus status,
 		LocalDateTime createdAt) {
 		this.id = id;
 		this.name = name;
@@ -27,8 +27,8 @@ public class AdminResponseDto {
 		this.createdAt = createdAt;
 	}
 
-	public static AdminResponseDto from(Admin admin) {
-		return new AdminResponseDto(
+	public static AdminSignupResponse from(Admin admin) {
+		return new AdminSignupResponse(
 			admin.getId(),
 			admin.getName(),
 			admin.getEmail(),
