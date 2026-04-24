@@ -18,12 +18,12 @@ public class AdminService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
-	public AdminSignupResponse signup(AdminSignupRequest requestDto) {
-		if (adminRepository.existsByEmail(requestDto.getEmail())) {
+	public AdminSignupResponse signup(AdminSignupRequest request) {
+		if (adminRepository.existsByEmail(request.getEmail())) {
 			throw new IllegalArgumentException("이미 사용중인 이메일입니다.");
 		}
-		String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
-		Admin admin = requestDto.toEntity(encodedPassword);
+		String encodedPassword = passwordEncoder.encode(request.getPassword());
+		Admin admin = request.toEntity(encodedPassword);
 		Admin savedAdmin = adminRepository.save(admin);
 		return AdminSignupResponse.from(savedAdmin);
 	}
