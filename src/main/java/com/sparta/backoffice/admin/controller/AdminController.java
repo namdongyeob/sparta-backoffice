@@ -46,9 +46,17 @@ public class AdminController {
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.getAdmins(request));
 	}
+
 	@GetMapping("/me")
 	public ResponseEntity<AdminGetMeResponse> getMe(HttpSession session) {
-		Long adminId = (Long) session.getAttribute("adminId");
+		Long adminId = (Long)session.getAttribute("adminId");
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.getMe(adminId));
+	}
+
+	@PostMapping("/{id}/approve")
+	public ResponseEntity<AdminGetResponse> approveAdmin(
+		@PathVariable Long id
+	) {
+		return ResponseEntity.status(HttpStatus.OK).body(adminService.approveAdmin(id));
 	}
 }

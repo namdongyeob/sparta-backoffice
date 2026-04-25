@@ -14,6 +14,7 @@ import com.sparta.backoffice.admin.dto.AdminLoginRequest;
 import com.sparta.backoffice.admin.dto.AdminSignupResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupRequest;
 import com.sparta.backoffice.admin.entity.Admin;
+import com.sparta.backoffice.admin.enums.AdminStatus;
 import com.sparta.backoffice.admin.repository.AdminRepository;
 import com.sparta.backoffice.common.config.PasswordEncoder;
 
@@ -89,5 +90,18 @@ public class AdminService {
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다."));
 
 		return AdminGetMeResponse.from(admin);
+	}
+
+	@Transactional
+	public AdminGetResponse approveAdmin(Long adminId) {
+		Admin admin = adminRepository.findById(adminId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않은 관리자입니다."));
+
+		if (admin.getStatus() != AdminStatus.PENDING) {
+			throw new IllegalStateException("승인 대기 중인 관리자만 승인할 수 있습니다.");
+		}
+
+		admin.approve();
+		return AdminGetResponse.from(admin);
 	}
 }
