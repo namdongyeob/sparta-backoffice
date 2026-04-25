@@ -20,17 +20,11 @@ public class AuthController {
 	private final AdminService adminService;
 
 	@PostMapping("/login")
-	public ResponseEntity<Void> login(@RequestBody AdminLoginRequest request, HttpSession session) {
+	public ResponseEntity<Void> login(@RequestBody AdminLoginRequest request, HttpSession session){
 		Admin admin = adminService.login(request);
-		session.setAttribute("adminId", admin.getId());
-		session.setAttribute("adminEmail", admin.getEmail());
-		session.setAttribute("adminRole", admin.getRole());
-		return ResponseEntity.noContent().build();
-	}
-
-	@PostMapping("/logout")
-	public ResponseEntity<Void> logout(HttpSession session) {
-		session.invalidate();
+		session.setAttribute("adminId",admin.getId());
+		session.setAttribute("adminEmail",admin.getEmail());
+		session.setAttribute("adminRole",admin.getRole());
 		return ResponseEntity.noContent().build();
 	}
 }
