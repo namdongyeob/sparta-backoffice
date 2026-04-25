@@ -14,6 +14,8 @@ import com.sparta.backoffice.admin.dto.AdminLoginRequest;
 import com.sparta.backoffice.admin.dto.AdminRejectRequest;
 import com.sparta.backoffice.admin.dto.AdminSignupResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupRequest;
+import com.sparta.backoffice.admin.dto.AdminUpdateMeRequest;
+import com.sparta.backoffice.admin.dto.AdminUpdateMeResponse;
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.admin.enums.AdminStatus;
 import com.sparta.backoffice.admin.repository.AdminRepository;
@@ -117,5 +119,19 @@ public class AdminService {
 
 		admin.reject(request.getRejectionReason());
 		return AdminGetResponse.from(admin);
+	}
+
+	@Transactional
+	public AdminUpdateMeResponse updateMe(Long adminId, AdminUpdateMeRequest request) {
+		Admin admin = adminRepository.findById(adminId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않은 관리자입니다."));
+		String newEmail = request.getEmail();
+		if (newEmail != null && !newEmail.isBlank() && !newEmail.equals(admin.getEmail())) {
+			if (adminRepository.existsByEmail(newEmail)) {
+				throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+			}
+		}
+		admin.updateInfo(request.getName(), newEmail, request.getPhoneNumber());
+		return AdminUpdateMeResponse.from(admin);
 	}
 }
