@@ -16,6 +16,8 @@ import com.sparta.backoffice.admin.dto.AdminGetAllRequest;
 import com.sparta.backoffice.admin.dto.AdminGetMeResponse;
 import com.sparta.backoffice.admin.dto.AdminGetResponse;
 import com.sparta.backoffice.admin.dto.AdminRejectRequest;
+import com.sparta.backoffice.admin.dto.AdminRoleUpdateRequest;
+import com.sparta.backoffice.admin.dto.AdminRoleUpdateResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupRequest;
 import com.sparta.backoffice.admin.dto.AdminUpdateMeRequest;
@@ -79,5 +81,12 @@ public class AdminController {
 	) {
 		Long adminId = (Long)session.getAttribute("adminId");
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateMe(adminId, request));
+	}
+	@PatchMapping("/{id}/role")
+	public ResponseEntity<AdminRoleUpdateResponse> updateAdminRole(
+		@PathVariable Long id,
+		@Valid @RequestBody AdminRoleUpdateRequest request
+	) {
+		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateAdminRole(id, request));
 	}
 }
