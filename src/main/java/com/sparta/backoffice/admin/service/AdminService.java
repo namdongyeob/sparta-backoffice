@@ -1,8 +1,13 @@
 package com.sparta.backoffice.admin.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sparta.backoffice.admin.dto.AdminGetAllRequest;
 import com.sparta.backoffice.admin.dto.AdminGetResponse;
 import com.sparta.backoffice.admin.dto.AdminLoginRequest;
 import com.sparta.backoffice.admin.dto.AdminSignupResponse;
@@ -53,5 +58,27 @@ public class AdminService {
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다."));
 
 		return AdminGetResponse.from(admin);
+	}
+
+	@Transactional(readOnly = true)
+	public Page<AdminGetResponse> getAdmins(AdminGetAllRequest request) {
+		String sortBy = request.getSortBy() == null || request.getSortBy().isBlank()
+			? "createdAt" : request.getSortBy();
+		Sort.Direction direction = "asc".equalsIgnoreCase(request.getDirection())
+			? Sort.Direction.ASC : Sort.Direction.DESC;
+
+		Pageable pageable = PageRequest.of(
+			request.getPage() - 1,
+			request.getSize(),
+			Sort.by(direction, sortBy)
+		);
+
+		return adminRepository.searchAdmins(
+			request.getKeyword(),
+			request.getRole(),
+			request.getStatus(),
+			pageable
+		).map(AdminGetResponse::from);
+
 	}
 }
