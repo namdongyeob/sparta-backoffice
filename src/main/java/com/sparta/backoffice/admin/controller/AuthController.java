@@ -1,5 +1,6 @@
 package com.sparta.backoffice.admin.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,11 +21,17 @@ public class AuthController {
 	private final AdminService adminService;
 
 	@PostMapping("/login")
-	public ResponseEntity<Void> login(@RequestBody AdminLoginRequest request, HttpSession session){
+	public ResponseEntity<Void> login(@RequestBody AdminLoginRequest request, HttpSession session) {
 		Admin admin = adminService.login(request);
-		session.setAttribute("adminId",admin.getId());
-		session.setAttribute("adminEmail",admin.getEmail());
-		session.setAttribute("adminRole",admin.getRole());
-		return ResponseEntity.noContent().build();
+		session.setAttribute("adminId", admin.getId());
+		session.setAttribute("adminEmail", admin.getEmail());
+		session.setAttribute("adminRole", admin.getRole());
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<Void> logout(HttpSession session) {
+		session.invalidate();
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
