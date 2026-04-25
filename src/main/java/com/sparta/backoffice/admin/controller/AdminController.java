@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,8 @@ import com.sparta.backoffice.admin.dto.AdminGetResponse;
 import com.sparta.backoffice.admin.dto.AdminRejectRequest;
 import com.sparta.backoffice.admin.dto.AdminSignupResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupRequest;
+import com.sparta.backoffice.admin.dto.AdminUpdateMeRequest;
+import com.sparta.backoffice.admin.dto.AdminUpdateMeResponse;
 import com.sparta.backoffice.admin.service.AdminService;
 
 import jakarta.servlet.http.HttpSession;
@@ -67,5 +70,14 @@ public class AdminController {
 		@Valid @RequestBody AdminRejectRequest request
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.rejectAdmin(id, request));
+	}
+
+	@PatchMapping("/me")
+	public ResponseEntity<AdminUpdateMeResponse> updateMe(
+		HttpSession session,
+		@Valid @RequestBody AdminUpdateMeRequest request
+	) {
+		Long adminId = (Long)session.getAttribute("adminId");
+		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateMe(adminId, request));
 	}
 }
