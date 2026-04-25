@@ -11,6 +11,7 @@ import com.sparta.backoffice.admin.dto.AdminGetAllRequest;
 import com.sparta.backoffice.admin.dto.AdminGetMeResponse;
 import com.sparta.backoffice.admin.dto.AdminGetResponse;
 import com.sparta.backoffice.admin.dto.AdminLoginRequest;
+import com.sparta.backoffice.admin.dto.AdminPasswordUpdateRequest;
 import com.sparta.backoffice.admin.dto.AdminRejectRequest;
 import com.sparta.backoffice.admin.dto.AdminRoleUpdateRequest;
 import com.sparta.backoffice.admin.dto.AdminRoleUpdateResponse;
@@ -136,6 +137,7 @@ public class AdminService {
 		admin.updateInfo(request.getName(), newEmail, request.getPhoneNumber());
 		return AdminUpdateMeResponse.from(admin);
 	}
+
 	@Transactional
 	public AdminRoleUpdateResponse updateAdminRole(Long adminId, AdminRoleUpdateRequest request) {
 		Admin admin = adminRepository.findById(adminId)
@@ -143,5 +145,22 @@ public class AdminService {
 
 		admin.updateRole(request.getRole());
 		return AdminRoleUpdateResponse.from(admin);
+	}
+
+	@Transactional
+	public void updatePassword(Long adminId, AdminPasswordUpdateRequest request) {
+		Admin admin = adminRepository.findById(adminId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다."));
+
+		if (!passwordEncoder.matches(request.getCurrentPassword(), admin.getPassword())) {
+			throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+		}
+
+		if (request.getCurrentPassword().equals(request.getNewPassword())) {
+			throw new IllegalArgumentException("새 비밀번호는 기존 비밀번호와 달라야 합니다.");
+		}
+
+		String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
+		admin.updatePassword(encodedNewPassword);
 	}
 }

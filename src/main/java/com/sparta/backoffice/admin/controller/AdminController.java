@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sparta.backoffice.admin.dto.AdminGetAllRequest;
 import com.sparta.backoffice.admin.dto.AdminGetMeResponse;
 import com.sparta.backoffice.admin.dto.AdminGetResponse;
+import com.sparta.backoffice.admin.dto.AdminPasswordUpdateRequest;
 import com.sparta.backoffice.admin.dto.AdminRejectRequest;
 import com.sparta.backoffice.admin.dto.AdminRoleUpdateRequest;
 import com.sparta.backoffice.admin.dto.AdminRoleUpdateResponse;
@@ -82,11 +83,22 @@ public class AdminController {
 		Long adminId = (Long)session.getAttribute("adminId");
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateMe(adminId, request));
 	}
+
 	@PatchMapping("/{id}/role")
 	public ResponseEntity<AdminRoleUpdateResponse> updateAdminRole(
 		@PathVariable Long id,
 		@Valid @RequestBody AdminRoleUpdateRequest request
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateAdminRole(id, request));
+	}
+
+	@PatchMapping("/me/password")
+	public ResponseEntity<Void> updatePassword(
+		HttpSession session,
+		@Valid @RequestBody AdminPasswordUpdateRequest request
+	) {
+		Long adminId = (Long)session.getAttribute("adminId");
+		adminService.updatePassword(adminId, request);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
