@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sparta.backoffice.admin.dto.AdminGetAllRequest;
 import com.sparta.backoffice.admin.dto.AdminGetMeResponse;
 import com.sparta.backoffice.admin.dto.AdminGetResponse;
+import com.sparta.backoffice.admin.dto.AdminRejectRequest;
 import com.sparta.backoffice.admin.dto.AdminSignupResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupRequest;
 import com.sparta.backoffice.admin.service.AdminService;
@@ -58,5 +59,13 @@ public class AdminController {
 		@PathVariable Long id
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.approveAdmin(id));
+	}
+
+	@PostMapping("/{id}/reject")
+	public ResponseEntity<AdminGetResponse> rejectAdmin(
+		@PathVariable Long id,
+		@Valid @RequestBody AdminRejectRequest request
+	) {
+		return ResponseEntity.status(HttpStatus.OK).body(adminService.rejectAdmin(id, request));
 	}
 }
