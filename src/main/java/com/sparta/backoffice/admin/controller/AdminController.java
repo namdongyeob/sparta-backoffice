@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sparta.backoffice.admin.dto.AdminGetAllRequest;
+import com.sparta.backoffice.admin.dto.AdminGetMeResponse;
 import com.sparta.backoffice.admin.dto.AdminGetResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupRequest;
 import com.sparta.backoffice.admin.service.AdminService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -43,5 +45,10 @@ public class AdminController {
 		@ModelAttribute AdminGetAllRequest request
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.getAdmins(request));
+	}
+	@GetMapping("/me")
+	public ResponseEntity<AdminGetMeResponse> getMe(HttpSession session) {
+		Long adminId = (Long) session.getAttribute("adminId");
+		return ResponseEntity.status(HttpStatus.OK).body(adminService.getMe(adminId));
 	}
 }

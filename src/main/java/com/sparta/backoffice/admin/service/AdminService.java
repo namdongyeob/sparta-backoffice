@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.backoffice.admin.dto.AdminGetAllRequest;
+import com.sparta.backoffice.admin.dto.AdminGetMeResponse;
 import com.sparta.backoffice.admin.dto.AdminGetResponse;
 import com.sparta.backoffice.admin.dto.AdminLoginRequest;
 import com.sparta.backoffice.admin.dto.AdminSignupResponse;
@@ -80,5 +81,13 @@ public class AdminService {
 			pageable
 		).map(AdminGetResponse::from);
 
+	}
+
+	@Transactional(readOnly = true)
+	public AdminGetMeResponse getMe(Long adminId) {
+		Admin admin = adminRepository.findById(adminId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다."));
+
+		return AdminGetMeResponse.from(admin);
 	}
 }
