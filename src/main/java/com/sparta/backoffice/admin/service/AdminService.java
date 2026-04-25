@@ -3,6 +3,7 @@ package com.sparta.backoffice.admin.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sparta.backoffice.admin.dto.AdminGetResponse;
 import com.sparta.backoffice.admin.dto.AdminLoginRequest;
 import com.sparta.backoffice.admin.dto.AdminSignupResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupRequest;
@@ -28,14 +29,15 @@ public class AdminService {
 		Admin savedAdmin = adminRepository.save(admin);
 		return AdminSignupResponse.from(savedAdmin);
 	}
+
 	@Transactional(readOnly = true)
 	public Admin login(AdminLoginRequest request) {
 		Admin admin = adminRepository.findByEmail(request.getEmail()).orElseThrow(
 			() -> new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다."));
-		if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())){
+		if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
 			throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
 		}
-		switch (admin.getStatus()){
+		switch (admin.getStatus()) {
 			case PENDING -> throw new IllegalArgumentException("승인 대기 중인 계정입니다.");
 			case REJECTED -> throw new IllegalArgumentException("거부된 계정입니다.");
 			case SUSPENDED -> throw new IllegalArgumentException("정지된 계정입니다.");
@@ -43,5 +45,13 @@ public class AdminService {
 		}
 		return admin;
 
+	}
+
+	@Transactional(readOnly = true)
+	public AdminGetResponse getAdmin(Long adminId) {
+		Admin admin = adminRepository.findById(adminId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다."));
+
+		return AdminGetResponse.from(admin);
 	}
 }
