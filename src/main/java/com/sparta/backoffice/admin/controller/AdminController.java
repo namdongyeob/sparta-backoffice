@@ -3,6 +3,7 @@ package com.sparta.backoffice.admin.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -120,5 +121,13 @@ public class AdminController {
 		@Valid @RequestBody AdminStatusUpdateRequest request
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateAdminStatus(id, request));
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteAdmin(
+		@PathVariable Long id
+	) {
+		adminService.deleteAdmin(id);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
