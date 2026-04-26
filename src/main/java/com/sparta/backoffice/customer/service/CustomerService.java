@@ -27,7 +27,7 @@ public class CustomerService {
 
 		Pageable pageable = PageRequest.of(
 			request.getPage() - 1,
-			request.getLimit(),
+			request.getSize(),
 			Sort.by(sortOrder, sortBy)
 		);
 
