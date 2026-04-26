@@ -1,15 +1,29 @@
 package com.sparta.backoffice.order.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.sparta.backoffice.order.dto.OrderCreateRequest;
+import com.sparta.backoffice.order.dto.OrderCreateResponse;
 import com.sparta.backoffice.order.service.OrderService;
 
-import lombok.Getter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@Getter
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/orders")
 public class OrderController {
+
 	private final OrderService orderService;
+		@PostMapping
+		// adminId 세션으로 대체할 것
+		public ResponseEntity<OrderCreateResponse> createOrder(
+			@Valid @RequestBody OrderCreateRequest request, Long adminId) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.create(request, adminId));
+	}
 }
