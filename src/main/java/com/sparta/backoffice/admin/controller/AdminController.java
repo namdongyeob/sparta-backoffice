@@ -21,6 +21,8 @@ import com.sparta.backoffice.admin.dto.AdminRoleUpdateRequest;
 import com.sparta.backoffice.admin.dto.AdminRoleUpdateResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupRequest;
+import com.sparta.backoffice.admin.dto.AdminStatusUpdateRequest;
+import com.sparta.backoffice.admin.dto.AdminStatusUpdateResponse;
 import com.sparta.backoffice.admin.dto.AdminUpdateMeRequest;
 import com.sparta.backoffice.admin.dto.AdminUpdateMeResponse;
 import com.sparta.backoffice.admin.dto.AdminUpdateRequest;
@@ -110,5 +112,13 @@ public class AdminController {
 		@Valid @RequestBody AdminUpdateRequest Request
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateAdmin(id, Request));
+	}
+
+	@PatchMapping("/{id}/status")
+	public ResponseEntity<AdminStatusUpdateResponse> updateAdminStatus(
+		@PathVariable Long id,
+		@Valid @RequestBody AdminStatusUpdateRequest request
+	) {
+		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateAdminStatus(id, request));
 	}
 }
