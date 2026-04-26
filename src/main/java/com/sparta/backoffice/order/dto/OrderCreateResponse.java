@@ -1,11 +1,8 @@
 package com.sparta.backoffice.order.dto;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 import com.sparta.backoffice.order.entity.Order;
-import com.sparta.backoffice.order.enums.OrderStatus;
 
 import lombok.Getter;
 
@@ -19,11 +16,16 @@ public class OrderCreateResponse {
 	private final int quantity;
 	private final int orderPrice;
 	private final int totalPrice;
-	private final String status;// 재고 변경에 따른 상품 상태
+	private final String status; // 재고 변경에 따른 상품 상태
 	private final LocalDateTime createdAt;
 
-	public OrderCreateResponse(Long id, String orderNumber,  String customerName, String productName,
-		int quantity, int orderPrice, int totalPrice, String status, LocalDateTime createdAt) {
+	private final String adminName;
+	private final String adminEmail;
+	private final String adminRole;
+
+	public OrderCreateResponse(Long id, String orderNumber, String customerName, String productName,
+		int quantity, int orderPrice, int totalPrice, String status, LocalDateTime createdAt, String adminName,
+		String adminEmail, String adminRole) {
 		this.id = id;
 		this.orderNumber = orderNumber;
 		this.customerName = customerName;
@@ -33,6 +35,9 @@ public class OrderCreateResponse {
 		this.totalPrice = totalPrice;
 		this.status = status;
 		this.createdAt = createdAt;
+		this.adminName = adminName;
+		this.adminEmail = adminEmail;
+		this.adminRole = adminRole;
 	}
 
 	public static OrderCreateResponse from(Order order) {
@@ -45,7 +50,10 @@ public class OrderCreateResponse {
 			order.getOrderPrice(),
 			order.getTotalPrice(),
 			order.getStatus().getDescription(),
-			order.getCreatedAt()
+			order.getCreatedAt(),
+			order.getAdmin() == null ? null : order.getAdmin().getName(),
+			order.getAdmin() == null ? null : order.getAdmin().getEmail(),
+			order.getAdmin() == null ? null : order.getAdmin().getRole().getDescription()
 		);
 	}
 }

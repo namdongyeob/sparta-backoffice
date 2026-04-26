@@ -1,5 +1,9 @@
 package com.sparta.backoffice.order.service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.stereotype.Service;
 
 import com.sparta.backoffice.admin.entity.Admin;
@@ -28,19 +32,14 @@ public class OrderService {
 
 	@Transactional
 	// adminId 세션으로 대체
-	public OrderCreateResponse create(@Valid OrderCreateRequest request, Long adminId) {
-		Customer customer = customerRepository.findById(request.getCustomerId())
-			.orElseThrow(() -> new IllegalStateException("존재하지 않는 고객입니다."));
-
-		Product product = productRepository.findById(request.getProductId())
-			.orElseThrow(() -> new IllegalStateException("존재하지 않는 상품입니다."));
-
-		Admin admin = adminRepository.findById(adminId)
-			.orElseThrow(() -> new IllegalStateException("존재하지 않는 관리자입니다."));
+	public OrderCreateResponse createByAdmin(@Valid OrderCreateRequest request, Long adminId) {
+		Customer customer = findCustomer(request.getCustomerId());
+		Product product = findProduct(request.getProductId());
+		Admin admin = findAdmin(adminId);
 
 		product.updateStock(request.getQuantity());
 
-		Order order = Order.create(
+		Order order = Order.createByAdmin(
 			generateOrderNumber(),
 			request.getQuantity(),
 			customer,
@@ -53,11 +52,50 @@ public class OrderService {
 		return OrderCreateResponse.from(savedOrder);
 	}
 
-	private String generateOrderNumber() {
-		return "ORD-" + System.currentTimeMillis();
+	@Transactional
+	public OrderCreateResponse createByCustomer(@Valid OrderCreateRequest request, Long customerId) {
+		Customer customer = findCustomer(request.getCustomerId());
+		Product product = findProduct(request.getProductId());
+
+		product.updateStock(request.getQuantity());
+
+		Order order = Order.createByCustomer(
+			generateOrderNumber(),
+			request.getQuantity(),
+			customer,
+			product
+		);
+
+		Order savedOrder = orderRepository.save(order);
+
+		return OrderCreateResponse.from(savedOrder);
 	}
 
-	private int getOrderPrice(int price, int quantity) {
-		return price * quantity;
+	private Customer findCustomer(Long customerId) {
+		return customerRepository.findById(customerId)
+			.orElseThrow(() -> new IllegalStateException("존재하지 않는 고객입니다."));
+	}
+
+	private Product findProduct(Long productId) {
+		return productRepository.findById(productId)
+			.orElseThrow(() -> new IllegalStateException("존재하지 않는 상품입니다."));
+	}
+
+	private Admin findAdmin(Long adminId) {
+		return adminRepository.findById(adminId)
+			.orElseThrow(() -> new IllegalStateException("존재하지 않는 관리자입니다."));
+	}
+
+	private String generateOrderNumber() {
+
+		LocalDate today = LocalDate.now();
+		String date = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+		long count = orderRepository.countByCreatedAtBetween(
+			today.atStartOfDay(),
+			today.atTime(LocalTime.MAX)
+		);
+
+		return date + "-" + String.format("%03d", count + 1);
 	}
 }

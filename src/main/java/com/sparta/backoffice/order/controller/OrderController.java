@@ -20,10 +20,22 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
 
 	private final OrderService orderService;
-		@PostMapping
-		// adminId 세션으로 대체할 것
-		public ResponseEntity<OrderCreateResponse> createOrder(
-			@Valid @RequestBody OrderCreateRequest request, Long adminId) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.create(request, adminId));
+
+	@PostMapping("/admin")
+	// adminId 세션으로 대체할 것
+	public ResponseEntity<OrderCreateResponse> createOrderByAdmin(
+		@Valid @RequestBody OrderCreateRequest request,
+		Long adminId
+	) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createByAdmin(request, adminId));
+	}
+
+	@PostMapping("/customer")
+	// customerId 세션으로 대체할 것
+	public ResponseEntity<OrderCreateResponse> createOrderByCustomer(
+		@Valid @RequestBody OrderCreateRequest request,
+		Long customerId
+	) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createByCustomer(request, customerId));
 	}
 }

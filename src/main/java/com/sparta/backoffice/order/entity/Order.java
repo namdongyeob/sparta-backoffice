@@ -59,7 +59,7 @@ public class Order extends BaseEntity {
 	private Product product;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "admin_id", nullable = true)
+	@JoinColumn(name = "admin_id")
 	private Admin admin; // CS 주문 등록 관리자 (nullable)
 
 	public Order(
@@ -77,14 +77,14 @@ public class Order extends BaseEntity {
 		LocalDateTime createdAt = this.getCreatedAt();
 	}
 
-	public static Order create(
+	public static Order createByAdmin(
 		String orderNumber,
 		int quantity,
 		Customer customer,
 		Product product,
 		Admin admin
 	) {
-		int orderPrice = product.getPrice(); // 스냅샷
+		int orderPrice = product.getPrice();
 		int totalPrice = orderPrice * quantity;
 
 		return new Order(
@@ -96,6 +96,27 @@ public class Order extends BaseEntity {
 			customer,
 			product,
 			admin
+		);
+	}
+
+	public static Order createByCustomer(
+		String orderNumber,
+		int quantity,
+		Customer customer,
+		Product product
+	) {
+		int orderPrice = product.getPrice();
+		int totalPrice = orderPrice * quantity;
+
+		return new Order(
+			orderNumber,
+			quantity,
+			orderPrice,
+			totalPrice,
+			OrderStatus.PREPARING,
+			customer,
+			product,
+			null
 		);
 	}
 
@@ -123,6 +144,11 @@ public class Order extends BaseEntity {
 		if (this.status != OrderStatus.PREPARING) {
 			throw new IllegalStateException("준비중 상태만 취소 가능");
 		}
+
+		if (cancelReason == null || cancelReason.isBlank()) {
+			throw new IllegalArgumentException("주문 취소 사유는 필수입니다.");
+		}
+
 		this.status = OrderStatus.CANCELLED;
 		this.cancelReason = cancelReason;
 	}
