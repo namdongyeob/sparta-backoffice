@@ -28,7 +28,6 @@ import com.sparta.backoffice.admin.enums.AdminStatus;
 import com.sparta.backoffice.admin.repository.AdminRepository;
 import com.sparta.backoffice.common.config.PasswordEncoder;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -186,7 +185,7 @@ public class AdminService {
 	}
 
 	@Transactional
-	public AdminStatusUpdateResponse updateAdminStatus(Long adminId, @Valid AdminStatusUpdateRequest request) {
+	public AdminStatusUpdateResponse updateAdminStatus(Long adminId, AdminStatusUpdateRequest request) {
 		Admin admin = adminRepository.findById(adminId)
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않은 관리자입니다."));
 		admin.updateStatus(request.getStatus());
