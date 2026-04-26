@@ -17,6 +17,8 @@ import com.sparta.backoffice.admin.dto.AdminRoleUpdateRequest;
 import com.sparta.backoffice.admin.dto.AdminRoleUpdateResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupRequest;
+import com.sparta.backoffice.admin.dto.AdminStatusUpdateRequest;
+import com.sparta.backoffice.admin.dto.AdminStatusUpdateResponse;
 import com.sparta.backoffice.admin.dto.AdminUpdateMeRequest;
 import com.sparta.backoffice.admin.dto.AdminUpdateMeResponse;
 import com.sparta.backoffice.admin.dto.AdminUpdateRequest;
@@ -180,5 +182,13 @@ public class AdminService {
 
 		admin.updateInfo(request.getName(), newEmail, request.getPhoneNumber());
 		return AdminUpdateResponse.from(admin);
+	}
+
+	@Transactional
+	public AdminStatusUpdateResponse updateAdminStatus(Long adminId, AdminStatusUpdateRequest request) {
+		Admin admin = adminRepository.findById(adminId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않은 관리자입니다."));
+		admin.updateStatus(request.getStatus());
+		return AdminStatusUpdateResponse.from(admin);
 	}
 }
