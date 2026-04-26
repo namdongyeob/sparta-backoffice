@@ -23,6 +23,8 @@ import com.sparta.backoffice.admin.dto.AdminSignupResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupRequest;
 import com.sparta.backoffice.admin.dto.AdminUpdateMeRequest;
 import com.sparta.backoffice.admin.dto.AdminUpdateMeResponse;
+import com.sparta.backoffice.admin.dto.AdminUpdateRequest;
+import com.sparta.backoffice.admin.dto.AdminUpdateResponse;
 import com.sparta.backoffice.admin.service.AdminService;
 
 import jakarta.servlet.http.HttpSession;
@@ -100,5 +102,13 @@ public class AdminController {
 		Long adminId = (Long)session.getAttribute("adminId");
 		adminService.updatePassword(adminId, request);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@PatchMapping("/{id}")
+	public ResponseEntity<AdminUpdateResponse> updateAdmin(
+		@PathVariable Long id,
+		@Valid @RequestBody AdminUpdateRequest Request
+	) {
+		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateAdmin(id, Request));
 	}
 }
