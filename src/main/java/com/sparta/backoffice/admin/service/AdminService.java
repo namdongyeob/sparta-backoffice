@@ -36,6 +36,7 @@ public class AdminService {
 	private final AdminRepository adminRepository;
 	private final PasswordEncoder passwordEncoder;
 
+	// 회원가입 (이메일 중복 체크, 비밀번호 암호화)
 	@Transactional
 	public AdminSignupResponse signup(AdminSignupRequest request) {
 		if (adminRepository.existsByEmail(request.getEmail())) {
@@ -47,6 +48,7 @@ public class AdminService {
 		return AdminSignupResponse.from(savedAdmin);
 	}
 
+	// 로그인 (이메일/비밀번호 검증, 계정 상태 확인)
 	@Transactional(readOnly = true)
 	public Admin login(AdminLoginRequest request) {
 		Admin admin = adminRepository.findByEmail(request.getEmail()).orElseThrow(
@@ -64,6 +66,7 @@ public class AdminService {
 
 	}
 
+	// 특정 관리자 상세 조회
 	@Transactional(readOnly = true)
 	public AdminGetResponse getAdmin(Long adminId) {
 		Admin admin = adminRepository.findById(adminId)
@@ -72,6 +75,7 @@ public class AdminService {
 		return AdminGetResponse.from(admin);
 	}
 
+	// 관리자 목록 페이징 및 필터 조회
 	@Transactional(readOnly = true)
 	public Page<AdminGetResponse> getAdmins(AdminGetAllRequest request) {
 		String sortBy = request.getSortBy() == null || request.getSortBy().isBlank()
@@ -94,6 +98,7 @@ public class AdminService {
 
 	}
 
+	// 내 프로필 조회
 	@Transactional(readOnly = true)
 	public AdminGetMeResponse getMe(Long adminId) {
 		Admin admin = adminRepository.findById(adminId)
@@ -102,6 +107,7 @@ public class AdminService {
 		return AdminGetMeResponse.from(admin);
 	}
 
+	// 관리자 가입 승인 (PENDING -> ACTIVE)
 	@Transactional
 	public AdminGetResponse approveAdmin(Long adminId) {
 		Admin admin = adminRepository.findById(adminId)
@@ -115,6 +121,7 @@ public class AdminService {
 		return AdminGetResponse.from(admin);
 	}
 
+	// 관리자 가입 거절 (PENDING -> REJECTED)
 	@Transactional
 	public AdminGetResponse rejectAdmin(Long adminId, AdminRejectRequest request) {
 		Admin admin = adminRepository.findById(adminId)
@@ -128,6 +135,7 @@ public class AdminService {
 		return AdminGetResponse.from(admin);
 	}
 
+	// 내 프로필 정보 수정 (이메일 중복 검사 포함)
 	@Transactional
 	public AdminUpdateMeResponse updateMe(Long adminId, AdminUpdateMeRequest request) {
 		Admin admin = adminRepository.findById(adminId)
@@ -142,6 +150,7 @@ public class AdminService {
 		return AdminUpdateMeResponse.from(admin);
 	}
 
+	// 특정 관리자 역할(Role) 변경
 	@Transactional
 	public AdminRoleUpdateResponse updateAdminRole(Long adminId, AdminRoleUpdateRequest request) {
 		Admin admin = adminRepository.findById(adminId)
@@ -151,6 +160,7 @@ public class AdminService {
 		return AdminRoleUpdateResponse.from(admin);
 	}
 
+	// 비밀번호 변경 (기존 비밀번호 확인 로직 포함)
 	@Transactional
 	public void updatePassword(Long adminId, AdminPasswordUpdateRequest request) {
 		Admin admin = adminRepository.findById(adminId)
@@ -168,6 +178,7 @@ public class AdminService {
 		admin.updatePassword(encodedNewPassword);
 	}
 
+	// 특정 관리자 정보 수정 (이메일 중복 검사 포함)
 	@Transactional
 	public AdminUpdateResponse updateAdmin(Long adminId, AdminUpdateRequest request) {
 		Admin admin = adminRepository.findById(adminId)
@@ -184,6 +195,7 @@ public class AdminService {
 		return AdminUpdateResponse.from(admin);
 	}
 
+	// 특정 관리자 상태(Status) 변경
 	@Transactional
 	public AdminStatusUpdateResponse updateAdminStatus(Long adminId, AdminStatusUpdateRequest request) {
 		Admin admin = adminRepository.findById(adminId)
@@ -192,6 +204,7 @@ public class AdminService {
 		return AdminStatusUpdateResponse.from(admin);
 	}
 
+	// 관리자 삭제(탈퇴)
 	@Transactional
 	public void deleteAdmin(Long adminId) {
 		Admin admin = adminRepository.findById(adminId)
