@@ -2,6 +2,8 @@ package com.sparta.backoffice.order.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.SoftDelete;
+
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.common.entity.BaseEntity;
 import com.sparta.backoffice.customer.entity.Customer;
@@ -25,6 +27,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@SoftDelete(columnName = "is_deleted")
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
