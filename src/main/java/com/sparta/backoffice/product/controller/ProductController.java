@@ -37,7 +37,7 @@ public class ProductController {
 
 	@GetMapping
 	public ResponseEntity<Page<ProductGetAllResponse>> getProducts(
-		@ModelAttribute ProductGetAllRequest request
+		@Valid @ModelAttribute ProductGetAllRequest request
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(productService.getAll(request));
 	}
