@@ -15,6 +15,7 @@ import com.sparta.backoffice.product.dto.ProductCreateRequest;
 import com.sparta.backoffice.product.dto.ProductCreateResponse;
 import com.sparta.backoffice.product.dto.ProductGetAllRequest;
 import com.sparta.backoffice.product.dto.ProductGetAllResponse;
+import com.sparta.backoffice.product.dto.ProductGetResponse;
 import com.sparta.backoffice.product.entity.Product;
 import com.sparta.backoffice.product.repository.ProductRepository;
 
@@ -71,5 +72,13 @@ public class ProductService {
 			request.getStatus(),
 			pageable
 		).map(ProductGetAllResponse::from);
+	}
+
+	@Transactional(readOnly = true)
+	public ProductGetResponse getOne(Long productId) {
+		Product product = productRepository.findById(productId).orElseThrow(
+			() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+
+		return ProductGetResponse.from(product);
 	}
 }
