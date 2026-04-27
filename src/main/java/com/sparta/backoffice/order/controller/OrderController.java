@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sparta.backoffice.order.dto.OrderCreateRequest;
 import com.sparta.backoffice.order.dto.OrderCreateResponse;
 import com.sparta.backoffice.order.service.OrderService;
-import jakarta.servlet.http.HttpSession;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +22,7 @@ public class OrderController {
 
 	private final OrderService orderService;
 
+	// CS 주문 생성
 	@PostMapping("/admin")
 	public ResponseEntity<OrderCreateResponse> createOrderByAdmin(
 		HttpSession session,
@@ -31,6 +32,7 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createByAdmin(request, adminId));
 	}
 
+	// 관리자 주문 생성
 	@PostMapping("/customer")
 	public ResponseEntity<OrderCreateResponse> createOrderByCustomer(
 		HttpSession session,
