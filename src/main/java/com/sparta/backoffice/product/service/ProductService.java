@@ -16,6 +16,8 @@ import com.sparta.backoffice.product.dto.ProductCreateResponse;
 import com.sparta.backoffice.product.dto.ProductGetAllRequest;
 import com.sparta.backoffice.product.dto.ProductGetAllResponse;
 import com.sparta.backoffice.product.dto.ProductGetResponse;
+import com.sparta.backoffice.product.dto.ProductUpdateRequest;
+import com.sparta.backoffice.product.dto.ProductUpdateResponse;
 import com.sparta.backoffice.product.entity.Product;
 import com.sparta.backoffice.product.repository.ProductRepository;
 
@@ -80,5 +82,27 @@ public class ProductService {
 			() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 
 		return ProductGetResponse.from(product);
+	}
+
+	@Transactional
+	public ProductUpdateResponse update(Long adminId, Long productId, ProductUpdateRequest request) {
+		if (adminId == null) {
+			throw new IllegalStateException("로그인이 필요합니다.");
+		}
+
+		if (!adminRepository.existsById(adminId)) {
+			throw new IllegalArgumentException("존재하지 않는 관리자입니다.");
+		}
+
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+
+		product.updateInfo(
+			request.getName(),
+			request.getCategory(),
+			request.getPrice()
+		);
+
+		return ProductUpdateResponse.from(product);
 	}
 }
