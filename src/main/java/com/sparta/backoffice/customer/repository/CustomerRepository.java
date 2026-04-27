@@ -13,7 +13,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
 	// JPQL을 사용하여 이름 또는 이메일에 키워드가 포함된 데이터를 조회
 	@Query("SELECT c FROM Customer c WHERE "
-		+ "(:keyword IS NULL OR c.name LIKE CONCAT('%', :keyword, '%')"
+		+ "(:keyword IS NULL OR c.name LIKE CONCAT('%', :keyword, '%') "
 		+ "OR c.email LIKE CONCAT('%', :keyword, '%')) "
 		+ "AND (:status IS NULL OR c.status = :status)")
 	Page<Customer> searchCustomer(

@@ -5,8 +5,10 @@ import com.sparta.backoffice.admin.enums.AdminStatus;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class AdminGetAllRequest {
 	private String keyword;       // 검색 키워드 (이름, 이메일)
