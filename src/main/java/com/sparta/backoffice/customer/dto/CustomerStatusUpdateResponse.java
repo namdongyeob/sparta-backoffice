@@ -1,24 +1,23 @@
 package com.sparta.backoffice.customer.dto;
 
 import com.sparta.backoffice.customer.entity.Customer;
+import com.sparta.backoffice.customer.enums.CustomerStatus;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class CustomerUpdateResponse {
+public class CustomerStatusUpdateResponse {
 	private final Long id;
 	private final String name;
-	private final String email;
-	private final String phoneNumber;
+	private final CustomerStatus status;
 
-	public static CustomerUpdateResponse from(Customer customer) {
-		return new CustomerUpdateResponse(
+	public static CustomerStatusUpdateResponse from(Customer customer) {
+		return new CustomerStatusUpdateResponse(
 			customer.getId(),
 			customer.getName(),
-			customer.getEmail(),
-			customer.getPhoneNumber()
+			customer.getStatus()
 		);
 	}
 }
