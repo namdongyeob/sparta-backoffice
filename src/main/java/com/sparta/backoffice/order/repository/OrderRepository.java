@@ -14,7 +14,7 @@ import com.sparta.backoffice.order.enums.OrderStatus;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
 	@Query("SELECT o FROM Order o "
-		+ "JOIN o.customer c "
+		+ "JOIN FETCH o.customer c "
 		+ "JOIN o.product p "
 		+ "LEFT JOIN o.admin a "
 		+ "WHERE (:keyword IS NULL OR o.orderNumber LIKE CONCAT('%', :keyword, '%') "
