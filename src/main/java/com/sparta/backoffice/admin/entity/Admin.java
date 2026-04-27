@@ -3,6 +3,7 @@ package com.sparta.backoffice.admin.entity;
 import com.sparta.backoffice.admin.enums.AdminRole;
 import com.sparta.backoffice.admin.enums.AdminStatus;
 import com.sparta.backoffice.common.entity.BaseEntity;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,6 +11,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.SoftDelete;
+
+@SoftDelete(columnName = "is_deleted")
 @Getter
 @Entity
 @Table(name = "admins")
@@ -68,9 +72,12 @@ public class Admin extends BaseEntity {
 
 	// 정보 수정
 	public void updateInfo(String name, String email, String phoneNumber) {
-		this.name = name;
-		this.email = email;
-		this.phoneNumber = phoneNumber;
+		if (name != null)
+			this.name = name;
+		if (email != null)
+			this.email = email;
+		if (phoneNumber != null)
+			this.phoneNumber = phoneNumber;
 	}
 
 	// 비밀번호 변경
@@ -78,13 +85,13 @@ public class Admin extends BaseEntity {
 		this.password = password;
 	}
 
-	// 승인
+	// 승인 (PENDING -> ACTIVE)
 	public void approve() {
 		this.status = AdminStatus.ACTIVE;
 		this.approvedAt = LocalDateTime.now();
 	}
 
-	// 거부
+	// 거부 (PENDING -> REJECTED)
 	public void reject(String rejectionReason) {
 		this.status = AdminStatus.REJECTED;
 		this.rejectedAt = LocalDateTime.now();

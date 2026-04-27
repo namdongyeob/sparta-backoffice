@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 	private final AdminService adminService;
 
+	// 관리자 로그인
 	@PostMapping("/login")
 	public ResponseEntity<Void> login(@RequestBody AdminLoginRequest request, HttpSession session) {
 		Admin admin = adminService.login(request);
@@ -29,6 +30,7 @@ public class AuthController {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
+	// 관리자 로그아웃
 	@PostMapping("/logout")
 	public ResponseEntity<Void> logout(HttpSession session) {
 		session.invalidate();
