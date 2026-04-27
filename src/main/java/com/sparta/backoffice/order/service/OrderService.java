@@ -4,7 +4,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.admin.repository.AdminRepository;
@@ -12,13 +17,14 @@ import com.sparta.backoffice.customer.entity.Customer;
 import com.sparta.backoffice.customer.repository.CustomerRepository;
 import com.sparta.backoffice.order.dto.OrderCreateRequest;
 import com.sparta.backoffice.order.dto.OrderCreateResponse;
+import com.sparta.backoffice.order.dto.OrderGetAllRequest;
+import com.sparta.backoffice.order.dto.OrderGetResponse;
 import com.sparta.backoffice.order.entity.Order;
 import com.sparta.backoffice.order.repository.OrderRepository;
 import com.sparta.backoffice.product.entity.Product;
 import com.sparta.backoffice.product.enums.ProductStatus;
 import com.sparta.backoffice.product.repository.ProductRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -52,11 +58,11 @@ public class OrderService {
 		product.updateStock(product.getStock() - request.getQuantity());
 
 		Order order = Order.createByAdmin(
-				generateOrderNumber(),
-				request.getQuantity(),
-				customer,
-				product,
-				admin
+			generateOrderNumber(),
+			request.getQuantity(),
+			customer,
+			product,
+			admin
 		);
 
 		return OrderCreateResponse.from(orderRepository.save(order));
@@ -83,13 +89,35 @@ public class OrderService {
 		product.updateStock(product.getStock() - request.getQuantity());
 
 		Order order = Order.createByCustomer(
-				generateOrderNumber(),
-				request.getQuantity(),
-				customer,
-				product
+			generateOrderNumber(),
+			request.getQuantity(),
+			customer,
+			product
 		);
 
 		return OrderCreateResponse.from(orderRepository.save(order));
+	}
+
+	@Transactional(readOnly = true)
+	public Page<OrderGetResponse> getOrders(OrderGetAllRequest request) {
+		String sortBy = request.getSortBy() == null || request.getSortBy().isBlank()
+			? "createdAt" : request.getSortBy();
+
+		// 최신순 정렬 기본값
+		Sort.Direction direction = "asc".equalsIgnoreCase(request.getDirection())
+			? Sort.Direction.ASC : Sort.Direction.DESC;
+
+		Pageable pageable = PageRequest.of(
+			request.getPage() - 1,
+			request.getSize(),
+			Sort.by(direction, sortBy)
+		);
+
+		return orderRepository.searchOrders(
+			request.getKeyword(),
+			request.getStatus(),
+			pageable
+		).map(OrderGetResponse::from);
 	}
 
 	// 고객 검증
