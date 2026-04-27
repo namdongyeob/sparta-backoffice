@@ -92,23 +92,26 @@ public class OrderService {
 		return OrderCreateResponse.from(orderRepository.save(order));
 	}
 
+	// 고객 검증
 	private Customer findCustomer(Long customerId) {
 		return customerRepository.findById(customerId)
 			.orElseThrow(() -> new IllegalStateException("존재하지 않는 고객입니다."));
 	}
 
+	// 상품 검증
 	private Product findProduct(Long productId) {
 		return productRepository.findById(productId)
 			.orElseThrow(() -> new IllegalStateException("존재하지 않는 상품입니다."));
 	}
 
+	// 관리자 검증
 	private Admin findAdmin(Long adminId) {
 		return adminRepository.findById(adminId)
 			.orElseThrow(() -> new IllegalStateException("존재하지 않는 관리자입니다."));
 	}
 
+	// 주문번호 생성
 	private String generateOrderNumber() {
-
 		LocalDate today = LocalDate.now();
 		String date = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
