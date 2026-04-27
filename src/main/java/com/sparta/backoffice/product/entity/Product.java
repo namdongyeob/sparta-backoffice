@@ -2,67 +2,105 @@ package com.sparta.backoffice.product.entity;
 
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.common.entity.BaseEntity;
+import com.sparta.backoffice.product.enums.ProductCategory;
 import com.sparta.backoffice.product.enums.ProductStatus;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
 @Table(name = "products")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Column(nullable = false)
-    private String name;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false)
-    private String category;
+	@Column(nullable = false, length = 100)
+	private String name;
 
-    @Column(nullable = false)
-    private int price;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private ProductCategory category;
 
-    @Column(nullable = false)
-    private int stock;
+	@Column(nullable = false)
+	private int price;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ProductStatus status;
+	@Column(nullable = false)
+	private int stock;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id")
-    private Admin admin;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private ProductStatus status;
 
-    public Product(String name, String category, int price,
-                   int stock, ProductStatus status, Admin admin) {
-        this.name = name;
-        this.category = category;
-        this.price = price;
-        this.stock = stock;
-        this.status = status;
-        this.admin = admin;
-    }
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "admin_id", nullable = false)
+	private Admin admin;
 
-    // 상품 정보 수정
-    public void updateInfo(String name, String category, int price) {
-        this.name = name;
-        this.category = category;
-        this.price = price;
-    }
+	public Product(String name, ProductCategory category, int price, int stock, Admin admin) {
 
-    // 재고 변경 + 상태 자동 전환
-    public void updateStock(int stock) {
-        this.stock = stock;
-        if (this.status != ProductStatus.DISCONTINUED) {
-            this.status = stock <= 0 ? ProductStatus.SOLD_OUT : ProductStatus.ON_SALE;
-        }
-    }
+		if (price < 0) {
+			throw new IllegalArgumentException("가격은 0 이상이어야 합니다.");
+		}
 
-    // 상태 변경
-    public void updateStatus(ProductStatus status) {
-        this.status = status;
-    }
+		if (stock < 0) {
+			throw new IllegalArgumentException("재고는 0 이상이어야 합니다.");
+		}
+
+		this.name = name;
+		this.category = category;
+		this.price = price;
+		this.stock = stock;
+		this.admin = admin;
+		this.status = determineStatus(stock);
+	}
+
+	private ProductStatus determineStatus(int stock) {
+		return stock == 0 ? ProductStatus.SOLD_OUT : ProductStatus.ON_SALE;
+	}
+
+	public void updateInfo(String name, ProductCategory category, int price) {
+		if (price < 0) {
+			throw new IllegalArgumentException("가격은 0 이상이어야 합니다.");
+		}
+
+		this.name = name;
+		this.category = category;
+		this.price = price;
+	}
+
+	public void updateStock(int stock) {
+		if (stock < 0) {
+			throw new IllegalArgumentException("재고는 0 이상이어야 합니다.");
+		}
+
+		this.stock = stock;
+
+		// 단종이면 상태 유지
+		if (this.status != ProductStatus.DISCONTINUED) {
+			this.status = determineStatus(stock);
+		}
+	}
+
+	public void updateStatus(ProductStatus status) {
+		if (this.status == ProductStatus.DISCONTINUED) {
+			throw new IllegalStateException("단종 상품은 상태를 변경할 수 없습니다.");
+		}
+
+		this.status = status;
+	}
 }
