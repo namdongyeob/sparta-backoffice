@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sparta.backoffice.customer.dto.CustomerGetOneResponse;
 import com.sparta.backoffice.customer.dto.CustomerGetRequest;
 import com.sparta.backoffice.customer.dto.CustomerGetResponse;
+import com.sparta.backoffice.customer.dto.CustomerUpdateRequest;
+import com.sparta.backoffice.customer.dto.CustomerUpdateResponse;
 import com.sparta.backoffice.customer.entity.Customer;
 import com.sparta.backoffice.customer.repository.CustomerRepository;
 
@@ -48,6 +50,32 @@ public class CustomerService {
 		);
 
 		return CustomerGetOneResponse.from(customer);
+	}
+
+	@Transactional
+	public CustomerUpdateResponse update(Long customerId, CustomerUpdateRequest request) {
+		Customer customer = customerRepository.findById(customerId).orElseThrow(
+			() -> new IllegalArgumentException("존재하지 않는 고객입니다.")
+		);
+
+		if (!customer.getEmail().equals(request.getEmail())) {
+			if (customerRepository.existsByEmail(request.getEmail())) {
+				throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+			}
+		}
+
+		if (!customer.getPhoneNumber().equals(request.getPhoneNumber())) {
+			if (customerRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+				throw new IllegalArgumentException("이미 존재하는 휴대폰 번호입니다.");
+			}
+		}
+		customer.updateInfo(
+			request.getName(),
+			request.getEmail(),
+			request.getPhoneNumber()
+		);
+
+		return CustomerUpdateResponse.from(customer);
 	}
 }
 
