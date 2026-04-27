@@ -37,13 +37,6 @@ public class Customer extends BaseEntity {
 	@Column(nullable = false)
 	private CustomerStatus status;
 
-	public Customer(String name, String email, String phoneNumber) {
-		this.name = name;
-		this.email = email;
-		this.phoneNumber = phoneNumber;
-		this.status = CustomerStatus.ACTIVE;
-	}
-
 	// 정보 수정
 	public void updateInfo(String name, String email, String phoneNumber) {
 		this.name = name;
