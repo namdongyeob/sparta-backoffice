@@ -99,7 +99,7 @@ public class OrderService {
 	}
 
 	@Transactional(readOnly = true)
-	public Page<OrderGetResponse> getOrders(OrderGetAllRequest request) {
+	public Page<OrderGetResponse> getAll(OrderGetAllRequest request) {
 		String sortBy = request.getSortBy() == null || request.getSortBy().isBlank()
 			? "createdAt" : request.getSortBy();
 
@@ -118,6 +118,14 @@ public class OrderService {
 			request.getStatus(),
 			pageable
 		).map(OrderGetResponse::from);
+	}
+
+	@Transactional(readOnly = true)
+	public OrderGetResponse getOne(Long orderId) {
+		Order order = orderRepository.findById(orderId).orElseThrow(
+			() -> new IllegalArgumentException("존재하지 않는 주문입니다.")
+		);
+		return OrderGetResponse.from(order);
 	}
 
 	// 고객 검증
