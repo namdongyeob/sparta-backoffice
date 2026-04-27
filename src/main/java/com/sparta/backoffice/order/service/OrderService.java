@@ -15,10 +15,10 @@ import com.sparta.backoffice.order.dto.OrderCreateResponse;
 import com.sparta.backoffice.order.entity.Order;
 import com.sparta.backoffice.order.repository.OrderRepository;
 import com.sparta.backoffice.product.entity.Product;
+import com.sparta.backoffice.product.enums.ProductStatus;
 import com.sparta.backoffice.product.repository.ProductRepository;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -62,23 +62,6 @@ public class OrderService {
 		return OrderCreateResponse.from(orderRepository.save(order));
 	}
 
-	@Transactional
-	public OrderCreateResponse createByCustomer(@Valid OrderCreateRequest request, Long customerId) {
-		Customer customer = findCustomer(request.getCustomerId());
-		Product product = findProduct(request.getProductId());
-
-		product.updateStock(request.getQuantity());
-
-		Order order = Order.createByCustomer(
-			generateOrderNumber(),
-			request.getQuantity(),
-			customer,
-			product
-		);
-
-		Order savedOrder = orderRepository.save(order);
-
-		return OrderCreateResponse.from(savedOrder);
 	@Transactional
 	public OrderCreateResponse createByCustomer(OrderCreateRequest request, Long customerId) {
 		Customer customer = findCustomer(customerId);
