@@ -73,7 +73,6 @@ public class OrderController {
 		@PathVariable Long orderId,
 		@Valid @RequestBody OrderStatusUpdateRequest request
 	) {
-		System.out.println(orderId);
 		return ResponseEntity.status(HttpStatus.OK).body(orderService.updateStatus(orderId, request));
 	}
 }

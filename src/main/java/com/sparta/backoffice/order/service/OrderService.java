@@ -137,12 +137,10 @@ public class OrderService {
 	// 주문 상태 수정
 	@Transactional
 	public OrderStatusUpdateResponse updateStatus(Long orderId, OrderStatusUpdateRequest request) {
-		System.out.println(orderId);
 		Order order = orderRepository.findById(orderId).orElseThrow(
 			() -> new IllegalArgumentException("존재하지 않는 주문입니다.")
 		);
 		order.updateStatus(request.getStatus());
-		System.out.println("order.updateStatus(request.getStatus());" + order);
 
 		return OrderStatusUpdateResponse.from(order);
 	}
