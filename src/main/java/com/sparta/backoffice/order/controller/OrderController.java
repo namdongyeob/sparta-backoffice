@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sparta.backoffice.order.dto.OrderCreateRequest;
 import com.sparta.backoffice.order.dto.OrderCreateResponse;
 import com.sparta.backoffice.order.service.OrderService;
+import jakarta.servlet.http.HttpSession;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
