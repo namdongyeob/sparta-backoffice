@@ -36,6 +36,7 @@ public class OrderService {
 	private final ProductRepository productRepository;
 	private final AdminRepository adminRepository;
 
+	// CS 관리자 주문 생성
 	@Transactional
 	public OrderCreateResponse createByAdmin(OrderCreateRequest request, Long adminId) {
 		Customer customer = findCustomer(request.getCustomerId());
@@ -68,6 +69,7 @@ public class OrderService {
 		return OrderCreateResponse.from(orderRepository.save(order));
 	}
 
+	// 고객 주문 생성
 	@Transactional
 	public OrderCreateResponse createByCustomer(OrderCreateRequest request, Long customerId) {
 		Customer customer = findCustomer(customerId);
@@ -98,6 +100,7 @@ public class OrderService {
 		return OrderCreateResponse.from(orderRepository.save(order));
 	}
 
+	// 주문 전체 조회
 	@Transactional(readOnly = true)
 	public Page<OrderGetResponse> getAll(OrderGetAllRequest request) {
 		String sortBy = request.getSortBy() == null || request.getSortBy().isBlank()
@@ -120,6 +123,7 @@ public class OrderService {
 		).map(OrderGetResponse::from);
 	}
 
+	// 주문 상세 조회
 	@Transactional(readOnly = true)
 	public OrderGetResponse getOne(Long orderId) {
 		Order order = orderRepository.findById(orderId).orElseThrow(
