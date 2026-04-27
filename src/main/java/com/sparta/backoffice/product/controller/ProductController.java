@@ -48,11 +48,11 @@ public class ProductController {
 		return ResponseEntity.status(HttpStatus.OK).body(productService.getAll(request));
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping("/{productId}")
 	public ResponseEntity<ProductGetResponse> getProduct(
-		@PathVariable Long id
+		@PathVariable Long productId
 	) {
-		return ResponseEntity.status(HttpStatus.OK).body(productService.getOne(id));
+		return ResponseEntity.status(HttpStatus.OK).body(productService.getOne(productId));
 	}
 
 	@PatchMapping("/{productId}")

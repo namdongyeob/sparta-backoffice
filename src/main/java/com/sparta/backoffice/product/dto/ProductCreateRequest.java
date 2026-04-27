@@ -22,11 +22,13 @@ public class ProductCreateRequest {
 	@NotNull(message = "카테고리는 필수값입니다.")
 	private ProductCategory category;
 
+	@NotNull(message = "가격은 필수값입니다.")
 	@Min(value = 1, message = "가격은 1원 이상이어야 합니다.")
-	private int price;
+	private Integer price;
 
+	@NotNull(message = "재고는 필수값입니다.")
 	@Min(value = 1, message = "재고는 1개 이상이어야 합니다.")
-	private int stock;
+	private Integer stock;
 
 	public Product toEntity(Admin admin) {
 		return new Product(
