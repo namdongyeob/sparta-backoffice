@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sparta.backoffice.customer.dto.CustomerGetOneResponse;
 import com.sparta.backoffice.customer.dto.CustomerGetRequest;
 import com.sparta.backoffice.customer.dto.CustomerGetResponse;
+import com.sparta.backoffice.customer.dto.CustomerStatusUpdateRequest;
+import com.sparta.backoffice.customer.dto.CustomerStatusUpdateResponse;
 import com.sparta.backoffice.customer.dto.CustomerUpdateRequest;
 import com.sparta.backoffice.customer.dto.CustomerUpdateResponse;
 import com.sparta.backoffice.customer.service.CustomerService;
@@ -46,6 +48,14 @@ public class CustomerController {
 		@PathVariable Long customerId, @Valid @RequestBody CustomerUpdateRequest request
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(customerService.update(customerId, request));
+	}
+
+	@PatchMapping("/{customerId}/status")
+	public ResponseEntity<CustomerStatusUpdateResponse> updateStatus(
+		@PathVariable Long customerId,
+		@Valid @RequestBody CustomerStatusUpdateRequest request
+	){
+		return ResponseEntity.status(HttpStatus.OK).body(customerService.statusUpdate(customerId, request));
 	}
 
 }

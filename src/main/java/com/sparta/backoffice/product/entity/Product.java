@@ -73,8 +73,14 @@ public class Product extends BaseEntity {
 		return stock == 0 ? ProductStatus.SOLD_OUT : ProductStatus.ON_SALE;
 	}
 
-	public void updateInfo(String name, ProductCategory category, int price) {
-		if (price < 0) {
+	public void updateInfo(String name, ProductCategory category, Integer price) {
+		if (name == null || name.isBlank()) {
+			throw new IllegalArgumentException("상품명은 필수입니다.");
+		}
+		if (category == null) {
+			throw new IllegalArgumentException("카테고리는 필수입니다.");
+		}
+		if (price == null || price < 0) {
 			throw new IllegalArgumentException("가격은 0 이상이어야 합니다.");
 		}
 

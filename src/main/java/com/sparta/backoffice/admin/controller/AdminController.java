@@ -40,11 +40,13 @@ import lombok.RequiredArgsConstructor;
 public class AdminController {
 	private final AdminService adminService;
 
+	// 관리자 회원가입
 	@PostMapping("/signup")
 	public ResponseEntity<AdminSignupResponse> signup(@Valid @RequestBody AdminSignupRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(adminService.signup(request));
 	}
 
+	// 특정 관리자 상세 조회
 	@GetMapping("/{id}")
 	public ResponseEntity<AdminGetResponse> getAdmin(
 		@PathVariable Long id
@@ -52,6 +54,7 @@ public class AdminController {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.getAdmin(id));
 	}
 
+	// 관리자 목록 페이징 및 필터 조회
 	@GetMapping
 	public ResponseEntity<Page<AdminGetResponse>> getAdmins(
 		@ModelAttribute AdminGetAllRequest request
@@ -59,12 +62,17 @@ public class AdminController {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.getAdmins(request));
 	}
 
+	// 내 프로필 조회
 	@GetMapping("/me")
 	public ResponseEntity<AdminGetMeResponse> getMe(HttpSession session) {
 		Long adminId = (Long)session.getAttribute("adminId");
+		if (adminId == null) {
+			throw new IllegalArgumentException("로그인이 필요합니다.");
+		}
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.getMe(adminId));
 	}
 
+	// 관리자 가입 승인 (슈퍼 관리자 권한 필요)
 	@PostMapping("/{id}/approve")
 	public ResponseEntity<AdminGetResponse> approveAdmin(
 		@PathVariable Long id
@@ -72,6 +80,7 @@ public class AdminController {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.approveAdmin(id));
 	}
 
+	// 관리자 가입 거절 (슈퍼 관리자 권한 필요)
 	@PostMapping("/{id}/reject")
 	public ResponseEntity<AdminGetResponse> rejectAdmin(
 		@PathVariable Long id,
@@ -80,15 +89,20 @@ public class AdminController {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.rejectAdmin(id, request));
 	}
 
+	// 내 프로필 정보 수정
 	@PatchMapping("/me")
 	public ResponseEntity<AdminUpdateMeResponse> updateMe(
 		HttpSession session,
 		@Valid @RequestBody AdminUpdateMeRequest request
 	) {
 		Long adminId = (Long)session.getAttribute("adminId");
+		if (adminId == null) {
+			throw new IllegalArgumentException("로그인이 필요합니다.");
+		}
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateMe(adminId, request));
 	}
 
+	// 특정 관리자 역할(Role) 변경
 	@PatchMapping("/{id}/role")
 	public ResponseEntity<AdminRoleUpdateResponse> updateAdminRole(
 		@PathVariable Long id,
@@ -97,16 +111,21 @@ public class AdminController {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateAdminRole(id, request));
 	}
 
+	// 내 비밀번호 변경
 	@PatchMapping("/me/password")
 	public ResponseEntity<Void> updatePassword(
 		HttpSession session,
 		@Valid @RequestBody AdminPasswordUpdateRequest request
 	) {
 		Long adminId = (Long)session.getAttribute("adminId");
+		if (adminId == null) {
+			throw new IllegalArgumentException("로그인이 필요합니다.");
+		}
 		adminService.updatePassword(adminId, request);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
+	// 특정 관리자 정보 수정
 	@PatchMapping("/{id}")
 	public ResponseEntity<AdminUpdateResponse> updateAdmin(
 		@PathVariable Long id,
@@ -115,6 +134,7 @@ public class AdminController {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateAdmin(id, Request));
 	}
 
+	// 특정 관리자 상태(Status) 변경
 	@PatchMapping("/{id}/status")
 	public ResponseEntity<AdminStatusUpdateResponse> updateAdminStatus(
 		@PathVariable Long id,
@@ -123,6 +143,7 @@ public class AdminController {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateAdminStatus(id, request));
 	}
 
+	// 관리자 삭제(탈퇴)
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteAdmin(
 		@PathVariable Long id
