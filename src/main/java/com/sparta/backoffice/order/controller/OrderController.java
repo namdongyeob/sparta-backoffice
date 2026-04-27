@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,8 @@ import com.sparta.backoffice.order.dto.OrderCreateRequest;
 import com.sparta.backoffice.order.dto.OrderCreateResponse;
 import com.sparta.backoffice.order.dto.OrderGetAllRequest;
 import com.sparta.backoffice.order.dto.OrderGetResponse;
+import com.sparta.backoffice.order.dto.OrderStatusUpdateRequest;
+import com.sparta.backoffice.order.dto.OrderStatusUpdateResponse;
 import com.sparta.backoffice.order.service.OrderService;
 
 import jakarta.servlet.http.HttpSession;
@@ -58,9 +61,18 @@ public class OrderController {
 
 	// 주문 상세 조회
 	@GetMapping("/{orderId}")
-	public ResponseEntity<OrderGetResponse> getOrder(@Valid @PathVariable Long orderId
+	public ResponseEntity<OrderGetResponse> getOrder(
+		@PathVariable Long orderId
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(orderService.getOne(orderId));
 	}
 
+	// 주문 상태 수정
+	@PatchMapping("/{orderId}/status")
+	public ResponseEntity<OrderStatusUpdateResponse> updateStatus(
+		@PathVariable Long orderId,
+		@Valid @RequestBody OrderStatusUpdateRequest request
+	) {
+		return ResponseEntity.status(HttpStatus.OK).body(orderService.updateStatus(orderId, request));
+	}
 }
