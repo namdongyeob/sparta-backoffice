@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sparta.backoffice.customer.dto.CustomerGetOneResponse;
 import com.sparta.backoffice.customer.dto.CustomerGetRequest;
 import com.sparta.backoffice.customer.dto.CustomerGetResponse;
+import com.sparta.backoffice.customer.dto.CustomerStatusUpdateRequest;
+import com.sparta.backoffice.customer.dto.CustomerStatusUpdateResponse;
 import com.sparta.backoffice.customer.dto.CustomerUpdateRequest;
 import com.sparta.backoffice.customer.dto.CustomerUpdateResponse;
 import com.sparta.backoffice.customer.entity.Customer;
@@ -76,6 +78,23 @@ public class CustomerService {
 		);
 
 		return CustomerUpdateResponse.from(customer);
+	}
+
+	@Transactional
+	public CustomerStatusUpdateResponse statusUpdate(Long customerId, CustomerStatusUpdateRequest request) {
+		Customer customer = customerRepository.findById(customerId).orElseThrow(
+			() -> new IllegalArgumentException("존재하지 않는 고객입니다.")
+		);
+
+		if (customer.getStatus().equals(request.getStatus())) {
+			throw new IllegalArgumentException("이미 해당 상태입니다.");
+		}
+
+		customer.updateStatus(
+			request.getStatus()
+		);
+
+		return CustomerStatusUpdateResponse.from(customer);
 	}
 }
 
