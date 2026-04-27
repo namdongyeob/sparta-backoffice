@@ -58,7 +58,7 @@ public class OrderController {
 
 	// 주문 상세 조회
 	@GetMapping("/{orderId}")
-	public ResponseEntity<OrderGetResponse> getOrder(@PathVariable Long orderId
+	public ResponseEntity<OrderGetResponse> getOrder(@Valid @PathVariable Long orderId
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(orderService.getOne(orderId));
 	}
