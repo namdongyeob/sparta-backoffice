@@ -1,13 +1,18 @@
 package com.sparta.backoffice.product.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.sparta.backoffice.product.dto.ProductCreateRequest;
 import com.sparta.backoffice.product.dto.ProductCreateResponse;
+import com.sparta.backoffice.product.dto.ProductGetAllRequest;
+import com.sparta.backoffice.product.dto.ProductGetAllResponse;
 import com.sparta.backoffice.product.service.ProductService;
 
 import jakarta.servlet.http.HttpSession;
@@ -29,4 +34,12 @@ public class ProductController {
 		Long adminId = (Long) session.getAttribute("adminId");
 		return ResponseEntity.status(HttpStatus.CREATED).body(productService.create(adminId, request));
 	}
+
+	@GetMapping
+	public ResponseEntity<Page<ProductGetAllResponse>> getProducts(
+		@ModelAttribute ProductGetAllRequest request
+	) {
+		return ResponseEntity.status(HttpStatus.OK).body(productService.getAll(request));
+	}
+
 }

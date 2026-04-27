@@ -1,13 +1,23 @@
 package com.sparta.backoffice.product.service;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.admin.repository.AdminRepository;
 import com.sparta.backoffice.product.dto.ProductCreateRequest;
 import com.sparta.backoffice.product.dto.ProductCreateResponse;
+import com.sparta.backoffice.product.dto.ProductGetAllRequest;
+import com.sparta.backoffice.product.dto.ProductGetAllResponse;
 import com.sparta.backoffice.product.entity.Product;
 import com.sparta.backoffice.product.repository.ProductRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,5 +41,35 @@ public class ProductService {
 		Product savedProduct = productRepository.save(product);
 
 		return ProductCreateResponse.from(savedProduct);
+	}
+
+	@Transactional(readOnly = true)
+	public Page<ProductGetAllResponse> getAll(ProductGetAllRequest request) {
+		String sortBy = request.getSortBy() == null || request.getSortBy().isBlank()
+			? "createdAt" : request.getSortBy();
+
+		List<String> allowedSort = List.of("price", "stock", "createdAt");
+		if (!allowedSort.contains(sortBy)) {
+			sortBy = "createdAt";
+		}
+
+		Sort.Direction direction = "asc".equalsIgnoreCase(request.getDirection())
+			? Sort.Direction.ASC : Sort.Direction.DESC;
+
+		Pageable pageable = PageRequest.of(
+			request.getPage() - 1, request.getSize(), Sort.by(direction, sortBy)
+		);
+
+		String keyword = request.getKeyword();
+		if (keyword != null && keyword.isBlank()) {
+			keyword = null;
+		}
+
+		return productRepository.searchProducts(
+			keyword,
+			request.getCategory(),
+			request.getStatus(),
+			pageable
+		).map(ProductGetAllResponse::from);
 	}
 }
