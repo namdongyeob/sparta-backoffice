@@ -7,8 +7,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sparta.backoffice.customer.dto.CustomerGetOneResponse;
 import com.sparta.backoffice.customer.dto.CustomerGetRequest;
 import com.sparta.backoffice.customer.dto.CustomerGetResponse;
+import com.sparta.backoffice.customer.entity.Customer;
 import com.sparta.backoffice.customer.repository.CustomerRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,15 @@ public class CustomerService {
 			pageable
 		).map(CustomerGetResponse::from);
 
+	}
+
+	@Transactional(readOnly = true)
+	public CustomerGetOneResponse getOne(Long customerId) {
+		Customer customer = customerRepository.findById(customerId).orElseThrow(
+			() -> new IllegalArgumentException("존재하지 않는 고객입니다.")
+		);
+
+		return CustomerGetOneResponse.from(customer);
 	}
 }
 
