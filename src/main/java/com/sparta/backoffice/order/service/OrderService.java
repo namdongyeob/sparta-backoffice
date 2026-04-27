@@ -31,25 +31,35 @@ public class OrderService {
 	private final AdminRepository adminRepository;
 
 	@Transactional
-	// adminId 세션으로 대체
-	public OrderCreateResponse createByAdmin(@Valid OrderCreateRequest request, Long adminId) {
+	public OrderCreateResponse createByAdmin(OrderCreateRequest request, Long adminId) {
 		Customer customer = findCustomer(request.getCustomerId());
 		Product product = findProduct(request.getProductId());
 		Admin admin = findAdmin(adminId);
 
-		product.updateStock(request.getQuantity());
+		// 상품 상태 검증
+		if (product.getStatus() == ProductStatus.DISCONTINUED) {
+			throw new IllegalArgumentException("단종된 상품은 주문할 수 없습니다.");
+		}
+		if (product.getStatus() == ProductStatus.SOLD_OUT) {
+			throw new IllegalArgumentException("품절된 상품은 주문할 수 없습니다.");
+		}
+
+		// 재고 검증
+		if (product.getStock() < request.getQuantity()) {
+			throw new IllegalArgumentException("재고가 부족합니다.");
+		}
+
+		product.updateStock(product.getStock() - request.getQuantity());
 
 		Order order = Order.createByAdmin(
-			generateOrderNumber(),
-			request.getQuantity(),
-			customer,
-			product,
-			admin
+				generateOrderNumber(),
+				request.getQuantity(),
+				customer,
+				product,
+				admin
 		);
 
-		Order savedOrder = orderRepository.save(order);
-
-		return OrderCreateResponse.from(savedOrder);
+		return OrderCreateResponse.from(orderRepository.save(order));
 	}
 
 	@Transactional
@@ -69,6 +79,34 @@ public class OrderService {
 		Order savedOrder = orderRepository.save(order);
 
 		return OrderCreateResponse.from(savedOrder);
+	@Transactional
+	public OrderCreateResponse createByCustomer(OrderCreateRequest request, Long customerId) {
+		Customer customer = findCustomer(customerId);
+		Product product = findProduct(request.getProductId());
+
+		// 상품 상태 검증
+		if (product.getStatus() == ProductStatus.DISCONTINUED) {
+			throw new IllegalArgumentException("단종된 상품은 주문할 수 없습니다.");
+		}
+		if (product.getStatus() == ProductStatus.SOLD_OUT) {
+			throw new IllegalArgumentException("품절된 상품은 주문할 수 없습니다.");
+		}
+
+		// 재고 검증
+		if (product.getStock() < request.getQuantity()) {
+			throw new IllegalArgumentException("재고가 부족합니다.");
+		}
+
+		product.updateStock(product.getStock() - request.getQuantity());
+
+		Order order = Order.createByCustomer(
+				generateOrderNumber(),
+				request.getQuantity(),
+				customer,
+				product
+		);
+
+		return OrderCreateResponse.from(orderRepository.save(order));
 	}
 
 	private Customer findCustomer(Long customerId) {

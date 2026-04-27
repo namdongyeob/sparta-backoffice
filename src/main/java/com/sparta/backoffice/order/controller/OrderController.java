@@ -23,20 +23,20 @@ public class OrderController {
 	private final OrderService orderService;
 
 	@PostMapping("/admin")
-	// adminId 세션으로 대체할 것
 	public ResponseEntity<OrderCreateResponse> createOrderByAdmin(
-		@Valid @RequestBody OrderCreateRequest request,
-		Long adminId
+		HttpSession session,
+		@Valid @RequestBody OrderCreateRequest request
 	) {
+		Long adminId = (Long) session.getAttribute("adminId");
 		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createByAdmin(request, adminId));
 	}
 
 	@PostMapping("/customer")
-	// customerId 세션으로 대체할 것
 	public ResponseEntity<OrderCreateResponse> createOrderByCustomer(
-		@Valid @RequestBody OrderCreateRequest request,
-		Long customerId
+		HttpSession session,
+		@Valid @RequestBody OrderCreateRequest request
 	) {
+		Long customerId = (Long) session.getAttribute("customerId");
 		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createByCustomer(request, customerId));
 	}
 }
