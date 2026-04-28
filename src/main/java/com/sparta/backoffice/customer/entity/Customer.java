@@ -1,5 +1,8 @@
 package com.sparta.backoffice.customer.entity;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import com.sparta.backoffice.common.entity.BaseEntity;
 import com.sparta.backoffice.customer.enums.CustomerStatus;
 
@@ -19,6 +22,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "customers")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE customers SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Customer extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,4 +53,5 @@ public class Customer extends BaseEntity {
 	public void updateStatus(CustomerStatus status) {
 		this.status = status;
 	}
+
 }
