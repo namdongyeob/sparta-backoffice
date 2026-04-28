@@ -67,10 +67,6 @@ public class Product extends BaseEntity {
 		this.status = determineStatus(stock);
 	}
 
-	private ProductStatus determineStatus(int stock) {
-		return stock == 0 ? ProductStatus.SOLD_OUT : ProductStatus.ON_SALE;
-	}
-
 	public void updateInfo(String name, ProductCategory category, Integer price) {
 		if (name != null) {
 			validateName(name);
@@ -114,6 +110,10 @@ public class Product extends BaseEntity {
 		if (this.status != ProductStatus.DISCONTINUED) {
 			this.status = determineStatus(stock);
 		}
+	}
+
+	private ProductStatus determineStatus(int stock) {
+		return stock == 0 ? ProductStatus.SOLD_OUT : ProductStatus.ON_SALE;
 	}
 
 	public void updateStatus(ProductStatus status) {
