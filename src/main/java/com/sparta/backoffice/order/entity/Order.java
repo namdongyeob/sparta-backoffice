@@ -2,7 +2,8 @@ package com.sparta.backoffice.order.entity;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.common.entity.BaseEntity;
@@ -25,10 +26,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@SoftDelete(columnName = "is_deleted")
 @Getter
 @Entity
 @Table(name = "orders")
+@SQLDelete(sql = "UPDATE orders SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
 	@Id
@@ -80,7 +82,7 @@ public class Order extends BaseEntity {
 		LocalDateTime createdAt = this.getCreatedAt();
 	}
 
-	public static Order createByAdmin(
+	public static Order createAdmin(
 		String orderNumber,
 		int quantity,
 		Customer customer,
@@ -102,7 +104,7 @@ public class Order extends BaseEntity {
 		);
 	}
 
-	public static Order createByCustomer(
+	public static Order createCustomer(
 		String orderNumber,
 		int quantity,
 		Customer customer,
@@ -156,3 +158,5 @@ public class Order extends BaseEntity {
 		this.cancelReason = cancelReason;
 	}
 }
+
+

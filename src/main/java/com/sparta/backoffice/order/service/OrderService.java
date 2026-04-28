@@ -41,7 +41,7 @@ public class OrderService {
 
 	// CS 관리자 주문 생성
 	@Transactional
-	public OrderCreateResponse createByAdmin(OrderCreateRequest request, Long adminId) {
+	public OrderCreateResponse createAdmin(OrderCreateRequest request, Long adminId) {
 		Customer customer = findCustomer(request.getCustomerId());
 		Product product = findProduct(request.getProductId());
 		Admin admin = findAdmin(adminId);
@@ -56,7 +56,7 @@ public class OrderService {
 
 		product.decreaseStock(product.getStock() - request.getQuantity());
 
-		Order order = Order.createByAdmin(
+		Order order = Order.createAdmin(
 			generateOrderNumber(),
 			request.getQuantity(),
 			customer,
@@ -69,7 +69,7 @@ public class OrderService {
 
 	// 고객 주문 생성
 	@Transactional
-	public OrderCreateResponse createByCustomer(OrderCreateRequest request, Long customerId) {
+	public OrderCreateResponse createCustomer(OrderCreateRequest request, Long customerId) {
 		Customer customer = findCustomer(customerId);
 		Product product = findProduct(request.getProductId());
 
@@ -83,7 +83,7 @@ public class OrderService {
 
 		product.decreaseStock(product.getStock() - request.getQuantity());
 
-		Order order = Order.createByCustomer(
+		Order order = Order.createCustomer(
 			generateOrderNumber(),
 			request.getQuantity(),
 			customer,

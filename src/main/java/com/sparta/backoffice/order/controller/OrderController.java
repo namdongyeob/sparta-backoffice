@@ -34,20 +34,20 @@ public class OrderController {
 
 	// CS 관리자 주문 생성
 	@PostMapping("/admin")
-	public ResponseEntity<OrderCreateResponse> createOrderByAdmin(
+	public ResponseEntity<OrderCreateResponse> createAdmin(
 		HttpSession session,
 		@Valid @RequestBody OrderCreateRequest request
 	) {
 		Long adminId = (Long)session.getAttribute("adminId");
-		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createByAdmin(request, adminId));
+		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createAdmin(request, adminId));
 	}
 
 	// 고객 주문 생성
 	@PostMapping("/customer")
-	public ResponseEntity<OrderCreateResponse> createOrderByCustomer(
+	public ResponseEntity<OrderCreateResponse> createCustomer(
 		@Valid @RequestBody OrderCreateRequest request
 	) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createByCustomer(request, request.getCustomerId()));
+		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createCustomer(request, request.getCustomerId()));
 	}
 
 	// 주문 전체 조회

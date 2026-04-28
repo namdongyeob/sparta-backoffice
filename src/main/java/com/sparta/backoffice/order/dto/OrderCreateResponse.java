@@ -5,8 +5,10 @@ import java.time.LocalDateTime;
 import com.sparta.backoffice.order.entity.Order;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public class OrderCreateResponse {
 
 	private final Long id;
@@ -16,29 +18,11 @@ public class OrderCreateResponse {
 	private final int quantity;
 	private final int orderPrice;
 	private final int totalPrice;
-	private final String status; // 재고 변경에 따른 상품 상태
+	private final String status;
 	private final LocalDateTime createdAt;
-
 	private final String adminName;
 	private final String adminEmail;
 	private final String adminRole;
-
-	public OrderCreateResponse(Long id, String orderNumber, String customerName, String productName,
-		int quantity, int orderPrice, int totalPrice, String status, LocalDateTime createdAt, String adminName,
-		String adminEmail, String adminRole) {
-		this.id = id;
-		this.orderNumber = orderNumber;
-		this.customerName = customerName;
-		this.productName = productName;
-		this.quantity = quantity;
-		this.orderPrice = orderPrice;
-		this.totalPrice = totalPrice;
-		this.status = status;
-		this.createdAt = createdAt;
-		this.adminName = adminName;
-		this.adminEmail = adminEmail;
-		this.adminRole = adminRole;
-	}
 
 	public static OrderCreateResponse from(Order order) {
 		return new OrderCreateResponse(
