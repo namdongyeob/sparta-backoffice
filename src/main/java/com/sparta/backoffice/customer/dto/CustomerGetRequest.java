@@ -3,10 +3,12 @@ package com.sparta.backoffice.customer.dto;
 import com.sparta.backoffice.customer.enums.CustomerStatus;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class CustomerGetRequest {
 	private String keyword;
 	private int page = 1;

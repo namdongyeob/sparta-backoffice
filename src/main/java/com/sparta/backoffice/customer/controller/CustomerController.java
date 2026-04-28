@@ -56,7 +56,7 @@ public class CustomerController {
 		@PathVariable Long customerId,
 		@Valid @RequestBody CustomerStatusUpdateRequest request
 	) {
-		return ResponseEntity.status(HttpStatus.OK).body(customerService.statusUpdate(customerId, request));
+		return ResponseEntity.status(HttpStatus.OK).body(customerService.updateStatus(customerId, request));
 	}
 
 	@DeleteMapping("/{customerId}")

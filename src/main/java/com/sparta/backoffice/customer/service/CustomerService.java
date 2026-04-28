@@ -22,8 +22,10 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
+
 	private final CustomerRepository customerRepository;
 
+	// 고객 전체 조회
 	@Transactional(readOnly = true)
 	public Page<CustomerGetResponse> getAll(CustomerGetRequest request) {
 		String sortBy = request.getSortBy() == null || request.getSortBy().isBlank()
@@ -45,20 +47,18 @@ public class CustomerService {
 
 	}
 
+	// 고객 상세 조회
 	@Transactional(readOnly = true)
 	public CustomerGetOneResponse getOne(Long customerId) {
-		Customer customer = customerRepository.findById(customerId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 고객입니다.")
-		);
+		Customer customer = findCustomer(customerId);
 
 		return CustomerGetOneResponse.from(customer);
 	}
 
+	// 고객 수정
 	@Transactional
 	public CustomerUpdateResponse update(Long customerId, CustomerUpdateRequest request) {
-		Customer customer = customerRepository.findById(customerId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 고객입니다.")
-		);
+		Customer customer = findCustomer(customerId);
 
 		if (!customer.getEmail().equals(request.getEmail())) {
 			if (customerRepository.existsByEmail(request.getEmail())) {
@@ -80,11 +80,10 @@ public class CustomerService {
 		return CustomerUpdateResponse.from(customer);
 	}
 
+	// 고객 상태 변경
 	@Transactional
-	public CustomerStatusUpdateResponse statusUpdate(Long customerId, CustomerStatusUpdateRequest request) {
-		Customer customer = customerRepository.findById(customerId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 고객입니다.")
-		);
+	public CustomerStatusUpdateResponse updateStatus(Long customerId, CustomerStatusUpdateRequest request) {
+		Customer customer = findCustomer(customerId);
 
 		if (customer.getStatus().equals(request.getStatus())) {
 			throw new IllegalArgumentException("이미 해당 상태입니다.");
@@ -97,12 +96,19 @@ public class CustomerService {
 		return CustomerStatusUpdateResponse.from(customer);
 	}
 
+	// 고객 삭제
+	@Transactional
 	public void delete(Long customerId) {
-		Customer customer = customerRepository.findById(customerId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 고객입니다.")
-		);
+		Customer customer = findCustomer(customerId);
 
 		customerRepository.delete(customer);
+	}
+
+	// 고객 검증
+	private Customer findCustomer(Long customerId) {
+		return customerRepository.findById(customerId).orElseThrow(
+			() -> new IllegalArgumentException("존재하지 않는 고객입니다.")
+		);
 	}
 
 }
