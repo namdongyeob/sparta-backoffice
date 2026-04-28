@@ -22,8 +22,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "customers")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE customers SET deleted_at = NOW() WHERE id = ?")  // 소프트딜리트는 시간기록이 안됨  지금 사용한 방식이 삭제 조회 가능
-@SQLRestriction("deleted_at IS NULL")  // 삭제시간이 null인지 아닌지
+@SQLDelete(sql = "UPDATE customers SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Customer extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
