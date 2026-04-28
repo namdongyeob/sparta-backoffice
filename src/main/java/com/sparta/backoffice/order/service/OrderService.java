@@ -16,7 +16,6 @@ import com.sparta.backoffice.admin.repository.AdminRepository;
 import com.sparta.backoffice.customer.entity.Customer;
 import com.sparta.backoffice.customer.repository.CustomerRepository;
 import com.sparta.backoffice.order.dto.OrderCancelRequest;
-import com.sparta.backoffice.order.dto.OrderCancelResponse;
 import com.sparta.backoffice.order.dto.OrderCreateRequest;
 import com.sparta.backoffice.order.dto.OrderCreateResponse;
 import com.sparta.backoffice.order.dto.OrderGetAllRequest;
@@ -149,7 +148,7 @@ public class OrderService {
 
 	// 주문 취소
 	@Transactional
-	public OrderCancelResponse cancle(Long orderId, OrderCancelRequest request) {
+	public void cancle(Long orderId, OrderCancelRequest request) {
 		Order order = orderRepository.findById(orderId).orElseThrow(
 			() -> new IllegalArgumentException("존재하지 않는 주문입니다")
 		);
@@ -157,8 +156,6 @@ public class OrderService {
 
 		Product product = order.getProduct();
 		product.updateStock(order.getQuantity());
-
-		return OrderCancelResponse.from(order);
 	}
 
 	// 고객 검증

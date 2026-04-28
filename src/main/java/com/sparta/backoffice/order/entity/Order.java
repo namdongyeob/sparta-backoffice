@@ -2,8 +2,6 @@ package com.sparta.backoffice.order.entity;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.SoftDelete;
 
 import com.sparta.backoffice.admin.entity.Admin;
@@ -56,7 +54,6 @@ public class Order extends BaseEntity {
 	private String cancelReason;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "customer_id", nullable = false)
 	private Customer customer;
 

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sparta.backoffice.order.dto.OrderCancelRequest;
-import com.sparta.backoffice.order.dto.OrderCancelResponse;
 import com.sparta.backoffice.order.dto.OrderCreateRequest;
 import com.sparta.backoffice.order.dto.OrderCreateResponse;
 import com.sparta.backoffice.order.dto.OrderGetAllRequest;
@@ -80,7 +79,7 @@ public class OrderController {
 
 	// 주문 취소
 	@PatchMapping("/{orderId}/cancle")
-	public ResponseEntity<OrderCancelResponse> delete(
+	public ResponseEntity<Void> cancleOrder(
 		@PathVariable Long orderId,
 		@Valid @RequestBody OrderCancelRequest request
 	) {
