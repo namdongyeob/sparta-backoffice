@@ -137,14 +137,26 @@ public class Product extends BaseEntity {
 	}
 
 	public void decreaseStock(int quantity) {
+		if (this.status == ProductStatus.DISCONTINUED) {
+			throw new IllegalStateException("단종 상품은 주문할 수 없습니다.");
+		}
+
+		if (this.status == ProductStatus.SOLD_OUT) {
+			throw new IllegalStateException("품절 상품은 주문할 수 없습니다.");
+		}
+
+		if (quantity <= 0) {
+			throw new IllegalArgumentException("수량은 1개 이상이어야 합니다.");
+		}
+
 		if (this.stock < quantity) {
 			throw new IllegalArgumentException("재고가 부족합니다.");
 		}
 
 		this.stock -= quantity;
 
-		if (this.status != ProductStatus.DISCONTINUED) {
-			this.status = determineStatus(this.stock);
+		if (this.stock == 0) {
+			this.status = ProductStatus.SOLD_OUT;
 		}
 	}
 }
