@@ -119,18 +119,14 @@ public class OrderService {
 	// 주문 상세 조회
 	@Transactional(readOnly = true)
 	public OrderGetResponse getOne(Long orderId) {
-		Order order = orderRepository.findById(orderId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 주문입니다.")
-		);
+		Order order = findOrder(orderId);
 		return OrderGetResponse.from(order);
 	}
 
 	// 주문 상태 수정
 	@Transactional
 	public OrderStatusUpdateResponse updateStatus(Long orderId, OrderStatusUpdateRequest request) {
-		Order order = orderRepository.findById(orderId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 주문입니다.")
-		);
+		Order order = findOrder(orderId);
 		order.updateStatus(request.getStatus());
 
 		return OrderStatusUpdateResponse.from(order);
@@ -139,9 +135,7 @@ public class OrderService {
 	// 주문 취소
 	@Transactional
 	public void cancel(Long orderId, OrderCancelRequest request) {
-		Order order = orderRepository.findById(orderId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 주문입니다")
-		);
+		Order order = findOrder(orderId);
 		order.cancel(request.getCancelReason());
 
 		Product product = order.getProduct();
@@ -164,6 +158,12 @@ public class OrderService {
 	private Admin findAdmin(Long adminId) {
 		return adminRepository.findById(adminId)
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다."));
+	}
+
+	// 주문 검증
+	private Order findOrder(Long orderId) {
+		return orderRepository.findById(orderId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
 	}
 
 	// 주문번호 생성
