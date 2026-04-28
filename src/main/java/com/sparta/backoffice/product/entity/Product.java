@@ -1,5 +1,7 @@
 package com.sparta.backoffice.product.entity;
 
+import org.hibernate.annotations.SoftDelete;
+
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.common.entity.BaseEntity;
 import com.sparta.backoffice.product.enums.ProductCategory;
@@ -23,6 +25,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "products")
+@SoftDelete(columnName = "is_deleted")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product extends BaseEntity {
 
@@ -52,14 +55,9 @@ public class Product extends BaseEntity {
 	private Admin admin;
 
 	public Product(String name, ProductCategory category, int price, int stock, Admin admin) {
-
-		if (price < 0) {
-			throw new IllegalArgumentException("가격은 0 이상이어야 합니다.");
-		}
-
-		if (stock < 0) {
-			throw new IllegalArgumentException("재고는 0 이상이어야 합니다.");
-		}
+		validateName(name);
+		validatePrice(price);
+		validateStock(stock);
 
 		this.name = name;
 		this.category = category;
@@ -74,25 +72,41 @@ public class Product extends BaseEntity {
 	}
 
 	public void updateInfo(String name, ProductCategory category, Integer price) {
-		if (name == null || name.isBlank()) {
-			throw new IllegalArgumentException("상품명은 필수입니다.");
-		}
-		if (category == null) {
-			throw new IllegalArgumentException("카테고리는 필수입니다.");
-		}
-		if (price == null || price < 0) {
-			throw new IllegalArgumentException("가격은 0 이상이어야 합니다.");
+		if (name != null) {
+			validateName(name);
+			this.name = name;
 		}
 
-		this.name = name;
-		this.category = category;
-		this.price = price;
+		if (category != null) {
+			this.category = category;
+		}
+
+		if (price != null) {
+			validatePrice(price);
+			this.price = price;
+		}
 	}
 
-	public void updateStock(int stock) {
+	private void validateName(String name) {
+		if (name == null || name.isBlank()) {
+			throw new IllegalArgumentException("상품명은 비어있을 수 없습니다.");
+		}
+	}
+
+	private void validatePrice(int price) {
+		if (price < 0) {
+			throw new IllegalArgumentException("가격은 0 이상이어야 합니다.");
+		}
+	}
+
+	private void validateStock(int stock) {
 		if (stock < 0) {
 			throw new IllegalArgumentException("재고는 0 이상이어야 합니다.");
 		}
+	}
+
+	public void updateStock(int stock) {
+		validateStock(stock);
 
 		this.stock = stock;
 

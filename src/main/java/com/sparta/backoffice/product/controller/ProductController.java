@@ -3,6 +3,7 @@ package com.sparta.backoffice.product.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -19,6 +20,8 @@ import com.sparta.backoffice.product.dto.ProductGetAllResponse;
 import com.sparta.backoffice.product.dto.ProductGetResponse;
 import com.sparta.backoffice.product.dto.ProductUpdateRequest;
 import com.sparta.backoffice.product.dto.ProductUpdateResponse;
+import com.sparta.backoffice.product.dto.ProductUpdateStatusRequest;
+import com.sparta.backoffice.product.dto.ProductUpdateStatusResponse;
 import com.sparta.backoffice.product.service.ProductService;
 
 import jakarta.servlet.http.HttpSession;
@@ -48,11 +51,11 @@ public class ProductController {
 		return ResponseEntity.status(HttpStatus.OK).body(productService.getAll(request));
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping("/{productId}")
 	public ResponseEntity<ProductGetResponse> getProduct(
-		@PathVariable Long id
+		@PathVariable Long productId
 	) {
-		return ResponseEntity.status(HttpStatus.OK).body(productService.getOne(id));
+		return ResponseEntity.status(HttpStatus.OK).body(productService.getOne(productId));
 	}
 
 	@PatchMapping("/{productId}")
@@ -63,5 +66,25 @@ public class ProductController {
 	) {
 		Long adminId = (Long)session.getAttribute("adminId");
 		return ResponseEntity.status(HttpStatus.OK).body(productService.update(adminId, productId, request));
+	}
+
+	@PatchMapping("/{productId}/status")
+	public ResponseEntity<ProductUpdateStatusResponse> updateStatus(
+		HttpSession session,
+		@PathVariable Long productId,
+		@Valid @RequestBody ProductUpdateStatusRequest request
+	) {
+		Long adminId = (Long)session.getAttribute("adminId");
+		return ResponseEntity.status(HttpStatus.OK).body(productService.updateStatus(adminId, productId, request));
+	}
+
+	@DeleteMapping("/{productId}")
+	public ResponseEntity<Void> delete(
+		HttpSession session,
+		@PathVariable Long productId
+	) {
+		Long adminId = (Long)session.getAttribute("adminId");
+		productService.delete(adminId, productId);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
