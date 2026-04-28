@@ -22,6 +22,8 @@ import com.sparta.backoffice.product.dto.ProductUpdateRequest;
 import com.sparta.backoffice.product.dto.ProductUpdateResponse;
 import com.sparta.backoffice.product.dto.ProductUpdateStatusRequest;
 import com.sparta.backoffice.product.dto.ProductUpdateStatusResponse;
+import com.sparta.backoffice.product.dto.ProductUpdateStockRequest;
+import com.sparta.backoffice.product.dto.ProductUpdateStockResponse;
 import com.sparta.backoffice.product.service.ProductService;
 
 import jakarta.servlet.http.HttpSession;
@@ -66,6 +68,16 @@ public class ProductController {
 	) {
 		Long adminId = (Long)session.getAttribute("adminId");
 		return ResponseEntity.status(HttpStatus.OK).body(productService.update(adminId, productId, request));
+	}
+
+	@PatchMapping("/{productId}/stock")
+	public ResponseEntity<ProductUpdateStockResponse> updateStock(
+		HttpSession session,
+		@PathVariable Long productId,
+		@Valid @RequestBody ProductUpdateStockRequest request
+	) {
+		Long adminId = (Long)session.getAttribute("adminId");
+		return ResponseEntity.status(HttpStatus.OK).body(productService.updateStock(adminId, productId, request));
 	}
 
 	@PatchMapping("/{productId}/status")
