@@ -96,6 +96,14 @@ public class CustomerService {
 
 		return CustomerStatusUpdateResponse.from(customer);
 	}
+
+	public void delete(Long customerId) {
+		Customer customer = customerRepository.findById(customerId).orElseThrow(
+			() -> new IllegalArgumentException("존재하지 않는 고객입니다.")
+		);
+
+		customerRepository.delete(customer);
+	}
 }
 
 

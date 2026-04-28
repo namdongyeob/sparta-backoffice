@@ -3,6 +3,7 @@ package com.sparta.backoffice.customer.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -54,8 +55,17 @@ public class CustomerController {
 	public ResponseEntity<CustomerStatusUpdateResponse> updateStatus(
 		@PathVariable Long customerId,
 		@Valid @RequestBody CustomerStatusUpdateRequest request
-	){
+	) {
 		return ResponseEntity.status(HttpStatus.OK).body(customerService.statusUpdate(customerId, request));
+	}
+
+	@DeleteMapping("/{customerId}")
+	public ResponseEntity<Void> delete(
+		@PathVariable Long customerId
+	) {
+		customerService.delete(customerId);
+
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 }
