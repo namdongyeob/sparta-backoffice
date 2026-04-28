@@ -126,10 +126,10 @@ public class Order extends BaseEntity {
 	// 주문 상태 수정 (준비중 → 배송중 → 배송완료)
 	public void updateStatus(OrderStatus status) {
 		if (this.status == OrderStatus.CANCELLED) {
-			throw new IllegalStateException("취소된 주문은 변경 불가");
+			throw new IllegalArgumentException("취소된 주문은 변경 불가");
 		}
 		if (this.status == OrderStatus.DELIVERED) {
-			throw new IllegalStateException("배송완료 주문은 변경 불가");
+			throw new IllegalArgumentException("배송완료 주문은 변경 불가");
 		}
 		if (this.status == OrderStatus.PREPARING && status == OrderStatus.SHIPPING) {
 			this.status = status;
@@ -139,13 +139,13 @@ public class Order extends BaseEntity {
 			this.status = status;
 			return;
 		}
-		throw new IllegalStateException("잘못된 상태 변경");
+		throw new IllegalArgumentException("잘못된 상태 변경");
 	}
 
 	// 주문 취소
 	public void cancel(String cancelReason) {
 		if (this.status != OrderStatus.PREPARING) {
-			throw new IllegalStateException("준비중 상태만 취소 가능합니다.");
+			throw new IllegalArgumentException("준비중 상태만 취소 가능합니다.");
 		}
 
 		if (cancelReason == null || cancelReason.isBlank()) {
