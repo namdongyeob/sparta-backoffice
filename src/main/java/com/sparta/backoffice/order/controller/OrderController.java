@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sparta.backoffice.order.dto.OrderCancelRequest;
+import com.sparta.backoffice.order.dto.OrderCancelResponse;
 import com.sparta.backoffice.order.dto.OrderCreateRequest;
 import com.sparta.backoffice.order.dto.OrderCreateResponse;
 import com.sparta.backoffice.order.dto.OrderGetAllRequest;
@@ -73,7 +75,16 @@ public class OrderController {
 		@PathVariable Long orderId,
 		@Valid @RequestBody OrderStatusUpdateRequest request
 	) {
-		System.out.println(orderId);
 		return ResponseEntity.status(HttpStatus.OK).body(orderService.updateStatus(orderId, request));
+	}
+
+	// 주문 취소
+	@PatchMapping("/{orderId}/cancle")
+	public ResponseEntity<OrderCancelResponse> delete(
+		@PathVariable Long orderId,
+		@Valid @RequestBody OrderCancelRequest request
+	) {
+		orderService.cancle(orderId, request);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }

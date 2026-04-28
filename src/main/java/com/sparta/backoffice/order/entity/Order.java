@@ -2,7 +2,8 @@ package com.sparta.backoffice.order.entity;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.common.entity.BaseEntity;
@@ -27,7 +28,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@SoftDelete(columnName = "is_deleted")
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
@@ -54,6 +54,7 @@ public class Order extends BaseEntity {
 	private String cancelReason;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "customer_id", nullable = false)
 	private Customer customer;
 
@@ -145,7 +146,7 @@ public class Order extends BaseEntity {
 	// 주문 취소
 	public void cancel(String cancelReason) {
 		if (this.status != OrderStatus.PREPARING) {
-			throw new IllegalStateException("준비중 상태만 취소 가능");
+			throw new IllegalStateException("준비중 상태만 취소 가능합니다.");
 		}
 
 		if (cancelReason == null || cancelReason.isBlank()) {
