@@ -48,8 +48,8 @@ public class OrderController {
 		HttpSession session,
 		@Valid @RequestBody OrderCreateRequest request
 	) {
-		Long customerId = (Long)session.getAttribute("customerId");
-		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createByCustomer(request, customerId));
+		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createByCustomer(request,
+			request.getCustomerId()));
 	}
 
 	// 주문 전체 조회

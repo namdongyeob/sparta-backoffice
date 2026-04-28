@@ -54,6 +54,7 @@ public class Order extends BaseEntity {
 	private String cancelReason;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	// @NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "customer_id", nullable = false)
 	private Customer customer;
 
