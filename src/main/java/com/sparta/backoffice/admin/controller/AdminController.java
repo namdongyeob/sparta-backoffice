@@ -65,11 +65,7 @@ public class AdminController {
 	// 내 프로필 조회
 	@GetMapping("/me")
 	public ResponseEntity<AdminGetMeResponse> getMe(HttpSession session) {
-		Long adminId = (Long)session.getAttribute("adminId");
-		if (adminId == null) {
-			throw new IllegalArgumentException("로그인이 필요합니다.");
-		}
-		return ResponseEntity.status(HttpStatus.OK).body(adminService.getMe(adminId));
+		return ResponseEntity.status(HttpStatus.OK).body(adminService.getMe(session));
 	}
 
 	// 관리자 가입 승인 (슈퍼 관리자 권한 필요)
@@ -95,11 +91,7 @@ public class AdminController {
 		HttpSession session,
 		@Valid @RequestBody AdminUpdateMeRequest request
 	) {
-		Long adminId = (Long)session.getAttribute("adminId");
-		if (adminId == null) {
-			throw new IllegalArgumentException("로그인이 필요합니다.");
-		}
-		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateMe(adminId, request));
+		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateMe(session, request));
 	}
 
 	// 특정 관리자 역할(Role) 변경
@@ -117,11 +109,7 @@ public class AdminController {
 		HttpSession session,
 		@Valid @RequestBody AdminPasswordUpdateRequest request
 	) {
-		Long adminId = (Long)session.getAttribute("adminId");
-		if (adminId == null) {
-			throw new IllegalArgumentException("로그인이 필요합니다.");
-		}
-		adminService.updatePassword(adminId, request);
+		adminService.updatePassword(session, request);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
@@ -129,9 +117,9 @@ public class AdminController {
 	@PatchMapping("/{id}")
 	public ResponseEntity<AdminUpdateResponse> updateAdmin(
 		@PathVariable Long id,
-		@Valid @RequestBody AdminUpdateRequest Request
+		@Valid @RequestBody AdminUpdateRequest request
 	) {
-		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateAdmin(id, Request));
+		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateAdmin(id, request));
 	}
 
 	// 특정 관리자 상태(Status) 변경

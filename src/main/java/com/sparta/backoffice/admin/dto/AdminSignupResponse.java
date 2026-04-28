@@ -7,8 +7,10 @@ import com.sparta.backoffice.admin.enums.AdminRole;
 import com.sparta.backoffice.admin.enums.AdminStatus;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public class AdminSignupResponse {
 	private final Long id;
 	private final String name;
@@ -16,16 +18,6 @@ public class AdminSignupResponse {
 	private final AdminRole role;
 	private final AdminStatus status;
 	private final LocalDateTime createdAt;
-
-	private AdminSignupResponse(Long id, String name, String email, AdminRole role, AdminStatus status,
-		LocalDateTime createdAt) {
-		this.id = id;
-		this.name = name;
-		this.email = email;
-		this.role = role;
-		this.status = status;
-		this.createdAt = createdAt;
-	}
 
 	public static AdminSignupResponse from(Admin admin) {
 		return new AdminSignupResponse(
