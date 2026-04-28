@@ -1,6 +1,7 @@
 package com.sparta.backoffice.product.entity;
 
-import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.common.entity.BaseEntity;
@@ -25,8 +26,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "products")
-@SoftDelete(columnName = "is_deleted")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE products SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Product extends BaseEntity {
 
 	@Id
@@ -90,7 +92,7 @@ public class Product extends BaseEntity {
 	}
 
 	private void validatePrice(int price) {
-		if (price < 0) {
+		if (price < 1) {
 			throw new IllegalArgumentException("가격은 0 이상이어야 합니다.");
 		}
 	}
