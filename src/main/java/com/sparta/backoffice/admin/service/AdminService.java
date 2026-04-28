@@ -24,11 +24,12 @@ import com.sparta.backoffice.admin.dto.AdminUpdateMeResponse;
 import com.sparta.backoffice.admin.dto.AdminUpdateRequest;
 import com.sparta.backoffice.admin.dto.AdminUpdateResponse;
 import com.sparta.backoffice.admin.entity.Admin;
+import com.sparta.backoffice.admin.enums.AdminRole;
 import com.sparta.backoffice.admin.enums.AdminStatus;
 import com.sparta.backoffice.admin.repository.AdminRepository;
 import com.sparta.backoffice.common.config.PasswordEncoder;
+import com.sparta.backoffice.common.dto.AdminInfo;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -57,25 +58,31 @@ public class AdminService {
 		if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
 			throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
 		}
-		switch (admin.getStatus()) {
-			case PENDING -> throw new IllegalArgumentException("승인 대기 중인 계정입니다.");
-			case REJECTED -> throw new IllegalArgumentException("거부된 계정입니다.");
-			case SUSPENDED -> throw new IllegalArgumentException("정지된 계정입니다.");
-			case INACTIVE -> throw new IllegalArgumentException("비활성화된 계정입니다.");
+		if (admin.getStatus() != AdminStatus.ACTIVE){
+			switch (admin.getStatus()) {
+				case PENDING -> throw new IllegalArgumentException("승인 대기 중인 계정입니다.");
+				case REJECTED -> throw new IllegalArgumentException("거부된 계정입니다.");
+				case SUSPENDED -> throw new IllegalArgumentException("정지된 계정입니다.");
+				case INACTIVE -> throw new IllegalArgumentException("비활성화된 계정입니다.");
+				default ->  throw new IllegalArgumentException("로그인 할수 없는 계정입니다.");
+			}
 		}
+
 		return admin;
 
 	}
 
 	// 특정 관리자 상세 조회
 	@Transactional(readOnly = true)
-	public AdminGetResponse getAdmin(Long adminId) {
+	public AdminGetResponse getAdmin(AdminInfo adminInfo, Long adminId) {
+		validateSuperAdmin(adminInfo);
 		return AdminGetResponse.from(findAdmin(adminId));
 	}
 
 	// 관리자 목록 페이징 및 필터 조회
 	@Transactional(readOnly = true)
-	public Page<AdminGetResponse> getAdmins(AdminGetAllRequest request) {
+	public Page<AdminGetResponse> getAdmins(AdminInfo adminInfo, AdminGetAllRequest request) {
+		validateSuperAdmin(adminInfo);
 		String sortBy = request.getSortBy() == null || request.getSortBy().isBlank()
 			? "createdAt" : request.getSortBy();
 		Sort.Direction direction = "asc".equalsIgnoreCase(request.getDirection())
@@ -98,16 +105,15 @@ public class AdminService {
 
 	// 내 프로필 조회
 	@Transactional(readOnly = true)
-	public AdminGetMeResponse getMe(HttpSession session) {
-		Long adminId = (Long)session.getAttribute("adminId");
-		if (adminId == null)
-			throw new IllegalArgumentException("로그인이 필요합니다.");
-		return AdminGetMeResponse.from(findAdmin(adminId));
+	public AdminGetMeResponse getMe(AdminInfo adminInfo) {
+		Admin admin = findAdmin(adminInfo.getId());
+		return AdminGetMeResponse.from(admin);
 	}
 
 	// 관리자 가입 승인 (PENDING -> ACTIVE)
 	@Transactional
-	public AdminGetResponse approveAdmin(Long adminId) {
+	public AdminGetResponse approveAdmin(AdminInfo adminInfo, Long adminId) {
+		validateSuperAdmin(adminInfo);
 		Admin admin = findAdmin(adminId);
 		if (admin.getStatus() != AdminStatus.PENDING) {
 			throw new IllegalStateException("승인 대기 중인 관리자만 승인할 수 있습니다.");
@@ -118,7 +124,8 @@ public class AdminService {
 
 	// 관리자 가입 거절 (PENDING -> REJECTED)
 	@Transactional
-	public AdminGetResponse rejectAdmin(Long adminId, AdminRejectRequest request) {
+	public AdminGetResponse rejectAdmin(AdminInfo adminInfo, Long adminId, AdminRejectRequest request) {
+		validateSuperAdmin(adminInfo);
 		Admin admin = findAdmin(adminId);
 		if (admin.getStatus() != AdminStatus.PENDING) {
 			throw new IllegalStateException("승인 대기 중인 관리자만 거절할 수 있습니다.");
@@ -129,11 +136,8 @@ public class AdminService {
 
 	// 내 프로필 정보 수정 (이메일 중복 검사 포함)
 	@Transactional
-	public AdminUpdateMeResponse updateMe(HttpSession session, AdminUpdateMeRequest request) {
-		Long adminId = (Long)session.getAttribute("adminId");
-		if (adminId == null)
-			throw new IllegalArgumentException("로그인이 필요합니다.");
-		Admin admin = findAdmin(adminId);
+	public AdminUpdateMeResponse updateMe(AdminInfo adminInfo, AdminUpdateMeRequest request) {
+		Admin admin = findAdmin(adminInfo.getId());
 		String newEmail = request.getEmail();
 		if (newEmail != null && !newEmail.isBlank() && !newEmail.equals(admin.getEmail())) {
 			if (adminRepository.existsByEmail(newEmail)) {
@@ -146,7 +150,8 @@ public class AdminService {
 
 	// 특정 관리자 역할(Role) 변경
 	@Transactional
-	public AdminRoleUpdateResponse updateAdminRole(Long adminId, AdminRoleUpdateRequest request) {
+	public AdminRoleUpdateResponse updateAdminRole(AdminInfo adminInfo, Long adminId, AdminRoleUpdateRequest request) {
+		validateSuperAdmin(adminInfo);
 		Admin admin = findAdmin(adminId);
 		admin.updateRole(request.getRole());
 		return AdminRoleUpdateResponse.from(admin);
@@ -154,11 +159,8 @@ public class AdminService {
 
 	// 비밀번호 변경 (기존 비밀번호 확인 로직 포함)
 	@Transactional
-	public void updatePassword(HttpSession session, AdminPasswordUpdateRequest request) {
-		Long adminId = (Long)session.getAttribute("adminId");
-		if (adminId == null)
-			throw new IllegalArgumentException("로그인이 필요합니다.");
-		Admin admin = findAdmin(adminId);
+	public void updatePassword(AdminInfo adminInfo, AdminPasswordUpdateRequest request) {
+		Admin admin = findAdmin(adminInfo.getId());
 		if (!passwordEncoder.matches(request.getCurrentPassword(), admin.getPassword())) {
 			throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
 		}
@@ -170,7 +172,8 @@ public class AdminService {
 
 	// 특정 관리자 정보 수정 (이메일 중복 검사 포함)
 	@Transactional
-	public AdminUpdateResponse updateAdmin(Long adminId, AdminUpdateRequest request) {
+	public AdminUpdateResponse updateAdmin(AdminInfo adminInfo, Long adminId, AdminUpdateRequest request) {
+		validateSuperAdmin(adminInfo);
 		Admin admin = findAdmin(adminId);
 		String newEmail = request.getEmail();
 		if (newEmail != null && !newEmail.isBlank() && !newEmail.equals(admin.getEmail())) {
@@ -184,7 +187,9 @@ public class AdminService {
 
 	// 특정 관리자 상태(Status) 변경
 	@Transactional
-	public AdminStatusUpdateResponse updateAdminStatus(Long adminId, AdminStatusUpdateRequest request) {
+	public AdminStatusUpdateResponse updateAdminStatus(AdminInfo adminInfo, Long adminId,
+		AdminStatusUpdateRequest request) {
+		validateSuperAdmin(adminInfo);
 		Admin admin = findAdmin(adminId);
 		admin.updateStatus(request.getStatus());
 		return AdminStatusUpdateResponse.from(admin);
@@ -192,14 +197,21 @@ public class AdminService {
 
 	// 관리자 삭제(탈퇴)
 	@Transactional
-	public void deleteAdmin(Long adminId) {
+	public void deleteAdmin(AdminInfo adminInfo, Long adminId) {
+		validateSuperAdmin(adminInfo);
 		Admin admin = findAdmin(adminId);
 		adminRepository.delete(admin);
 	}
 
 	// 공통 오류
-	private Admin findAdmin(Long adminId) {
+	public Admin findAdmin(Long adminId) {
 		return adminRepository.findById(adminId)
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다."));
+	}
+
+	public void validateSuperAdmin(AdminInfo adminInfo) {
+		if (adminInfo.getAdminRole() != AdminRole.SUPER_ADMIN) {
+			throw new IllegalArgumentException("슈퍼 관리자만 접근 가능합니다.");
+		}
 	}
 }
