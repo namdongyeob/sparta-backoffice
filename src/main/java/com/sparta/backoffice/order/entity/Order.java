@@ -25,9 +25,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@SoftDelete(columnName = "is_deleted")
 @Getter
 @Entity
-@SoftDelete(columnName = "is_deleted")
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
@@ -145,7 +145,7 @@ public class Order extends BaseEntity {
 	// 주문 취소
 	public void cancel(String cancelReason) {
 		if (this.status != OrderStatus.PREPARING) {
-			throw new IllegalStateException("준비중 상태만 취소 가능");
+			throw new IllegalStateException("준비중 상태만 취소 가능합니다.");
 		}
 
 		if (cancelReason == null || cancelReason.isBlank()) {
