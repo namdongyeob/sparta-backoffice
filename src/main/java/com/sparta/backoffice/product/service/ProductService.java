@@ -125,4 +125,20 @@ public class ProductService {
 
 		return ProductUpdateStatusResponse.from(product);
 	}
+
+	@Transactional
+	public void delete(Long adminId, Long productId) {
+		if (adminId == null) {
+			throw new IllegalStateException("로그인이 필요합니다.");
+		}
+
+		if (!adminRepository.existsById(adminId)) {
+			throw new IllegalArgumentException("존재하지 않는 관리자입니다.");
+		}
+
+		Product product = productRepository.findById(productId).orElseThrow(
+			() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+
+		productRepository.delete(product);
+	}
 }
