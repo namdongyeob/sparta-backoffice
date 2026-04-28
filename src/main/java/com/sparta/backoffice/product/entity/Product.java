@@ -123,4 +123,28 @@ public class Product extends BaseEntity {
 
 		this.status = status;
 	}
+
+	public void increaseStock(int quantity) {
+		if (quantity <= 0) {
+			throw new IllegalArgumentException("수량은 1개 이상이어야 합니다.");
+		}
+
+		this.stock += quantity;
+
+		if (this.status == ProductStatus.SOLD_OUT) {
+			this.status = ProductStatus.ON_SALE;
+		}
+	}
+
+	public void decreaseStock(int quantity) {
+		if (this.stock < quantity) {
+			throw new IllegalArgumentException("재고가 부족합니다.");
+		}
+
+		this.stock -= quantity;
+
+		if (this.status != ProductStatus.DISCONTINUED) {
+			this.status = determineStatus(this.stock);
+		}
+	}
 }
