@@ -85,10 +85,6 @@ public class CustomerService {
 	public CustomerStatusUpdateResponse updateStatus(Long customerId, CustomerStatusUpdateRequest request) {
 		Customer customer = findCustomer(customerId);
 
-		if (customer.getStatus().equals(request.getStatus())) {
-			throw new IllegalArgumentException("이미 해당 상태입니다.");
-		}
-
 		customer.updateStatus(
 			request.getStatus()
 		);
@@ -104,8 +100,9 @@ public class CustomerService {
 		customerRepository.delete(customer);
 	}
 
+
 	// 고객 검증
-	private Customer findCustomer(Long customerId) {
+	public Customer findCustomer(Long customerId) {
 		return customerRepository.findById(customerId).orElseThrow(
 			() -> new IllegalArgumentException("존재하지 않는 고객입니다.")
 		);
