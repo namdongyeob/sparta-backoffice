@@ -36,15 +36,9 @@ public class ProductService {
 
 	@Transactional
 	public ProductCreateResponse create(Long adminId, ProductCreateRequest request) {
-		if (adminId == null) {
-			throw new IllegalArgumentException("로그인이 필요합니다.");
-		}
-
-		Admin admin = adminRepository.findById(adminId)
-			.orElseThrow(() -> new IllegalArgumentException("관리자를 찾을 수 없습니다."));
+		Admin admin = findAdmin(adminId);
 
 		Product product = request.toEntity(admin);
-
 		Product savedProduct = productRepository.save(product);
 
 		return ProductCreateResponse.from(savedProduct);
@@ -64,7 +58,9 @@ public class ProductService {
 			? Sort.Direction.ASC : Sort.Direction.DESC;
 
 		Pageable pageable = PageRequest.of(
-			request.getPage() - 1, request.getSize(), Sort.by(direction, sortBy)
+			request.getPage() - 1,
+			request.getSize(),
+			Sort.by(direction, sortBy)
 		);
 
 		String keyword = request.getKeyword();
@@ -82,24 +78,16 @@ public class ProductService {
 
 	@Transactional(readOnly = true)
 	public ProductGetResponse getOne(Long productId) {
-		Product product = productRepository.findById(productId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+		Product product = findProduct(productId);
 
 		return ProductGetResponse.from(product);
 	}
 
 	@Transactional
 	public ProductUpdateResponse update(Long adminId, Long productId, ProductUpdateRequest request) {
-		if (adminId == null) {
-			throw new IllegalStateException("로그인이 필요합니다.");
-		}
+		findAdmin(adminId);
 
-		if (!adminRepository.existsById(adminId)) {
-			throw new IllegalArgumentException("존재하지 않는 관리자입니다.");
-		}
-
-		Product product = productRepository.findById(productId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+		Product product = findProduct(productId);
 
 		product.updateInfo(
 			request.getName(),
@@ -112,16 +100,9 @@ public class ProductService {
 
 	@Transactional
 	public ProductUpdateStockResponse updateStock(Long adminId, Long productId, ProductUpdateStockRequest request) {
-		if (adminId == null) {
-			throw new IllegalStateException("로그인이 필요합니다.");
-		}
+		findAdmin(adminId);
 
-		if (!adminRepository.existsById(adminId)) {
-			throw new IllegalArgumentException("존재하지 않는 관리자입니다.");
-		}
-
-		Product product = productRepository.findById(productId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+		Product product = findProduct(productId);
 
 		product.updateStock(request.getStock());
 
@@ -130,16 +111,9 @@ public class ProductService {
 
 	@Transactional
 	public ProductUpdateStatusResponse updateStatus(Long adminId, Long productId, ProductUpdateStatusRequest request) {
-		if (adminId == null) {
-			throw new IllegalStateException("로그인이 필요합니다.");
-		}
+		findAdmin(adminId);
 
-		if (!adminRepository.existsById(adminId)) {
-			throw new IllegalArgumentException("존재하지 않는 관리자입니다.");
-		}
-
-		Product product = productRepository.findById(productId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+		Product product = findProduct(productId);
 
 		product.updateStatus(request.getStatus());
 
@@ -148,17 +122,24 @@ public class ProductService {
 
 	@Transactional
 	public void delete(Long adminId, Long productId) {
-		if (adminId == null) {
-			throw new IllegalStateException("로그인이 필요합니다.");
-		}
+		findAdmin(adminId);
 
-		if (!adminRepository.existsById(adminId)) {
-			throw new IllegalArgumentException("존재하지 않는 관리자입니다.");
-		}
-
-		Product product = productRepository.findById(productId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+		Product product = findProduct(productId);
 
 		productRepository.delete(product);
+	}
+
+	private Admin findAdmin(Long adminId) {
+		if (adminId == null) {
+			throw new IllegalArgumentException("로그인이 필요합니다.");
+		}
+
+		return adminRepository.findById(adminId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다."));
+	}
+
+	private Product findProduct(Long productId) {
+		return productRepository.findById(productId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 	}
 }

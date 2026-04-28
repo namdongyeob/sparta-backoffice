@@ -2,12 +2,15 @@ package com.sparta.backoffice.product.dto;
 
 import java.time.LocalDateTime;
 
-import com.sparta.backoffice.product.enums.ProductCategory;
 import com.sparta.backoffice.product.entity.Product;
+import com.sparta.backoffice.product.enums.ProductCategory;
 import com.sparta.backoffice.product.enums.ProductStatus;
+
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public class ProductCreateResponse {
 
 	private final Long id;
@@ -19,21 +22,6 @@ public class ProductCreateResponse {
 	private final Long adminId;
 	private final LocalDateTime createdAt;
 	private final LocalDateTime modifiedAt;
-
-	public ProductCreateResponse(
-		Long id, String name, ProductCategory category, int price, int stock, ProductStatus status, Long adminId,
-		LocalDateTime createdAt, LocalDateTime modifiedAt
-	) {
-		this.id = id;
-		this.name = name;
-		this.category = category;
-		this.price = price;
-		this.stock = stock;
-		this.status = status;
-		this.adminId = adminId;
-		this.createdAt = createdAt;
-		this.modifiedAt = modifiedAt;
-	}
 
 	public static ProductCreateResponse from(Product product) {
 		return new ProductCreateResponse(

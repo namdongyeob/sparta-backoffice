@@ -4,6 +4,7 @@ import com.sparta.backoffice.product.enums.ProductCategory;
 import com.sparta.backoffice.product.enums.ProductStatus;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ProductGetAllRequest {
 
+	@Size(max = 50, message = "검색어는 50자 이내여야 합니다.")
 	private String keyword;        // 상품명 검색
 
 	@Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
