@@ -79,11 +79,11 @@ public class OrderController {
 
 	// 주문 취소
 	@PatchMapping("/{orderId}/cancle")
-	public ResponseEntity<Void> cancleOrder(
+	public ResponseEntity<Void> cancelOrder(
 		@PathVariable Long orderId,
 		@Valid @RequestBody OrderCancelRequest request
 	) {
-		orderService.cancle(orderId, request);
+		orderService.cancel(orderId, request);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
