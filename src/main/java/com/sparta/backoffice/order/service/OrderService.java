@@ -75,8 +75,6 @@ public class OrderService {
 	// 고객 주문 생성
 	@Transactional
 	public OrderCreateResponse createByCustomer(OrderCreateRequest request, Long customerId) {
-		System.out.println("customer = " + request.getCustomerId());
-		System.out.println("request = " + request.getProductId());
 		Customer customer = findCustomer(customerId);
 		Product product = findProduct(request.getProductId());
 
