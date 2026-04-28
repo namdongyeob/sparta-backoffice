@@ -11,9 +11,11 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
-@SoftDelete(columnName = "is_deleted")
+@SQLDelete(sql = "UPDATE admins SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 @Getter
 @Entity
 @Table(name = "admins")
@@ -49,6 +51,8 @@ public class Admin extends BaseEntity {
 	private LocalDateTime rejectedAt;
 
 	private String rejectionReason;
+
+	private LocalDateTime deletedAt;
 
 	public Admin(String name, String email, String password,
 		String phoneNumber, AdminRole role) {
