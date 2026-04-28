@@ -54,12 +54,7 @@ public class OrderService {
 			throw new IllegalArgumentException("품절된 상품은 주문할 수 없습니다.");
 		}
 
-		// 재고 검증
-		if (product.getStock() < request.getQuantity()) {
-			throw new IllegalArgumentException("재고가 부족합니다.");
-		}
-
-		product.updateStock(product.getStock() - request.getQuantity());
+		product.decreaseStock(product.getStock() - request.getQuantity());
 
 		Order order = Order.createByAdmin(
 			generateOrderNumber(),
@@ -86,12 +81,7 @@ public class OrderService {
 			throw new IllegalArgumentException("품절된 상품은 주문할 수 없습니다.");
 		}
 
-		// 재고 검증
-		if (product.getStock() < request.getQuantity()) {
-			throw new IllegalArgumentException("재고가 부족합니다.");
-		}
-
-		product.updateStock(product.getStock() - request.getQuantity());
+		product.decreaseStock(product.getStock() - request.getQuantity());
 
 		Order order = Order.createByCustomer(
 			generateOrderNumber(),
@@ -129,18 +119,14 @@ public class OrderService {
 	// 주문 상세 조회
 	@Transactional(readOnly = true)
 	public OrderGetResponse getOne(Long orderId) {
-		Order order = orderRepository.findById(orderId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 주문입니다.")
-		);
+		Order order = findOrder(orderId);
 		return OrderGetResponse.from(order);
 	}
 
 	// 주문 상태 수정
 	@Transactional
 	public OrderStatusUpdateResponse updateStatus(Long orderId, OrderStatusUpdateRequest request) {
-		Order order = orderRepository.findById(orderId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 주문입니다.")
-		);
+		Order order = findOrder(orderId);
 		order.updateStatus(request.getStatus());
 
 		return OrderStatusUpdateResponse.from(order);
@@ -148,32 +134,36 @@ public class OrderService {
 
 	// 주문 취소
 	@Transactional
-	public void cancle(Long orderId, OrderCancelRequest request) {
-		Order order = orderRepository.findById(orderId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 주문입니다")
-		);
+	public void cancel(Long orderId, OrderCancelRequest request) {
+		Order order = findOrder(orderId);
 		order.cancel(request.getCancelReason());
 
 		Product product = order.getProduct();
-		product.updateStock(order.getQuantity());
+		product.increaseStock(order.getQuantity());
 	}
 
 	// 고객 검증
 	private Customer findCustomer(Long customerId) {
 		return customerRepository.findById(customerId)
-			.orElseThrow(() -> new IllegalStateException("존재하지 않는 고객입니다."));
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 고객입니다."));
 	}
 
 	// 상품 검증
 	private Product findProduct(Long productId) {
 		return productRepository.findById(productId)
-			.orElseThrow(() -> new IllegalStateException("존재하지 않는 상품입니다."));
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 	}
 
 	// 관리자 검증
 	private Admin findAdmin(Long adminId) {
 		return adminRepository.findById(adminId)
-			.orElseThrow(() -> new IllegalStateException("존재하지 않는 관리자입니다."));
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다."));
+	}
+
+	// 주문 검증
+	private Order findOrder(Long orderId) {
+		return orderRepository.findById(orderId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
 	}
 
 	// 주문번호 생성
