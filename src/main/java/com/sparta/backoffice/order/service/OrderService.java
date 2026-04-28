@@ -99,14 +99,25 @@ public class OrderService {
 		String sortBy = request.getSortBy() == null || request.getSortBy().isBlank()
 			? "createdAt" : request.getSortBy();
 
-		// 최신순 정렬 기본값
-		Sort.Direction direction = "asc".equalsIgnoreCase(request.getDirection())
-			? Sort.Direction.ASC : Sort.Direction.DESC;
+		Sort sort;
+
+		if (request.getDirection() == null || request.getDirection().isBlank()) {
+			// 기본 정렬: 최신 날짜 먼저, 같은 날짜 안에서는 주문번호 빠른 순서
+			sort = Sort.by(
+				Sort.Order.desc("createdAt"),
+				Sort.Order.asc("orderNumber")
+			);
+		} else {
+			Sort.Direction direction = "asc".equalsIgnoreCase(request.getDirection())
+				? Sort.Direction.ASC : Sort.Direction.DESC;
+
+			sort = Sort.by(direction, sortBy);
+		}
 
 		Pageable pageable = PageRequest.of(
 			request.getPage() - 1,
 			request.getSize(),
-			Sort.by(direction, sortBy)
+			sort
 		);
 
 		return orderRepository.searchOrders(
