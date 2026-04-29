@@ -16,14 +16,18 @@ public class CustomerGetOneResponse {
 	private final String phoneNumber;
 	private final CustomerStatus status;
 	private final LocalDateTime createdAt;
+	private final long totalOrderCount;
+	private final long totalOrderAmount;
 
-	public static CustomerGetOneResponse from(Customer customer) {
+	public static CustomerGetOneResponse from(Customer customer, long totalOrderCount, long totalOrderAmount) {
 		return new CustomerGetOneResponse(
 			customer.getName(),
 			customer.getEmail(),
 			customer.getPhoneNumber(),
 			customer.getStatus(),
-			customer.getCreatedAt()
+			customer.getCreatedAt(),
+			totalOrderCount,
+			totalOrderAmount
 		);
 	}
 }
