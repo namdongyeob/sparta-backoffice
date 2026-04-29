@@ -30,7 +30,11 @@ public class CustomerService {
 			request.getKeyword(),
 			request.getStatus(),
 			request.getPageable()
-		).map(CustomerGetResponse::from);
+		).map(customer -> {
+			long totalOrderCount = customerRepository.countOrdersByCustomerId(customer.getId());
+			long totalOrderAmount = customerRepository.sumOrderAmountByCustomerId(customer.getId());
+			return CustomerGetResponse.from(customer, totalOrderCount, totalOrderAmount);
+		});
 
 	}
 
@@ -38,8 +42,9 @@ public class CustomerService {
 	@Transactional(readOnly = true)
 	public CustomerGetOneResponse getOne(Long customerId) {
 		Customer customer = findCustomer(customerId);
-
-		return CustomerGetOneResponse.from(customer);
+		long totalOrderCount = customerRepository.countOrdersByCustomerId(customerId);
+		long totalOrderAmount = customerRepository.sumOrderAmountByCustomerId(customerId);
+		return CustomerGetOneResponse.from(customer, totalOrderCount, totalOrderAmount);
 	}
 
 	// 고객 수정

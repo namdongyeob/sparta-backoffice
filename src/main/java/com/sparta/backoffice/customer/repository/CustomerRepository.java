@@ -21,6 +21,13 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 		@Param("status") CustomerStatus status,
 		Pageable pageable
 	);
+	// 특정 고객의 취소되지 않은 주문 수 조회
+	@Query("SELECT COUNT(o) FROM Order o WHERE o.customer.id = :customerId AND o.status != 'CANCELLED'")
+	long countOrdersByCustomerId(@Param("customerId") Long customerId);
+
+	// 특정 고객의 취소되지 않은 주문 총액 조회 (주문 없으면 0 반환)
+	@Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Order o WHERE o.customer.id = :customerId AND o.status != 'CANCELLED'")
+	long sumOrderAmountByCustomerId(@Param("customerId") Long customerId);
 
 	boolean existsByEmail(String email);
 
