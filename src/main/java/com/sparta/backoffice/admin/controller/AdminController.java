@@ -30,6 +30,7 @@ import com.sparta.backoffice.admin.dto.AdminUpdateMeResponse;
 import com.sparta.backoffice.admin.dto.AdminUpdateRequest;
 import com.sparta.backoffice.admin.dto.AdminUpdateResponse;
 import com.sparta.backoffice.admin.service.AdminService;
+import com.sparta.backoffice.common.constant.SessionConst;
 import com.sparta.backoffice.common.dto.AdminInfo;
 
 import jakarta.validation.Valid;
@@ -50,7 +51,7 @@ public class AdminController {
 	// 특정 관리자 상세 조회
 	@GetMapping("/{id}")
 	public ResponseEntity<AdminGetResponse> getAdmin(
-		@SessionAttribute("adminInfo") AdminInfo adminInfo
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo
 		, @PathVariable Long id
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.getAdmin(adminInfo, id));
@@ -59,7 +60,7 @@ public class AdminController {
 	// 관리자 목록 페이징 및 필터 조회
 	@GetMapping
 	public ResponseEntity<Page<AdminGetResponse>> getAdmins(
-		@SessionAttribute("adminInfo") AdminInfo adminInfo
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo
 		, @ModelAttribute AdminGetAllRequest request
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.getAdmins(adminInfo, request));
@@ -68,7 +69,7 @@ public class AdminController {
 	// 내 프로필 조회
 	@GetMapping("/me")
 	public ResponseEntity<AdminGetMeResponse> getMe(
-		@SessionAttribute("adminInfo") AdminInfo adminInfo
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.getMe(adminInfo));
 	}
@@ -76,7 +77,7 @@ public class AdminController {
 	// 관리자 가입 승인 (슈퍼 관리자 권한 필요)
 	@PostMapping("/{id}/approve")
 	public ResponseEntity<AdminGetResponse> approveAdmin(
-		@SessionAttribute("adminInfo") AdminInfo adminInfo
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo
 		, @PathVariable Long id
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.approveAdmin(adminInfo, id));
@@ -85,7 +86,7 @@ public class AdminController {
 	// 관리자 가입 거절 (슈퍼 관리자 권한 필요)
 	@PostMapping("/{id}/reject")
 	public ResponseEntity<AdminGetResponse> rejectAdmin(
-		@SessionAttribute("adminInfo") AdminInfo adminInfo
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo
 		, @PathVariable Long id,
 		@Valid @RequestBody AdminRejectRequest request
 	) {
@@ -95,7 +96,7 @@ public class AdminController {
 	// 내 프로필 정보 수정
 	@PatchMapping("/me")
 	public ResponseEntity<AdminUpdateMeResponse> updateMe(
-		@SessionAttribute("adminInfo") AdminInfo adminInfo,
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@Valid @RequestBody AdminUpdateMeRequest request
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.updateMe(adminInfo, request));
@@ -104,7 +105,7 @@ public class AdminController {
 	// 특정 관리자 역할(Role) 변경
 	@PatchMapping("/{id}/role")
 	public ResponseEntity<AdminRoleUpdateResponse> updateAdminRole(
-		@SessionAttribute("adminInfo") AdminInfo adminInfo,
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@PathVariable Long id,
 		@Valid @RequestBody AdminRoleUpdateRequest request
 	) {
@@ -114,7 +115,7 @@ public class AdminController {
 	// 내 비밀번호 변경
 	@PatchMapping("/me/password")
 	public ResponseEntity<Void> updatePassword(
-		@SessionAttribute("adminInfo") AdminInfo adminInfo,
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@Valid @RequestBody AdminPasswordUpdateRequest request
 	) {
 		adminService.updatePassword(adminInfo, request);
@@ -124,7 +125,7 @@ public class AdminController {
 	// 특정 관리자 정보 수정
 	@PatchMapping("/{id}")
 	public ResponseEntity<AdminUpdateResponse> updateAdmin(
-		@SessionAttribute("adminInfo") AdminInfo adminInfo,
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@PathVariable Long id,
 		@Valid @RequestBody AdminUpdateRequest request
 	) {
@@ -134,7 +135,7 @@ public class AdminController {
 	// 특정 관리자 상태(Status) 변경
 	@PatchMapping("/{id}/status")
 	public ResponseEntity<AdminStatusUpdateResponse> updateAdminStatus(
-		@SessionAttribute("adminInfo") AdminInfo adminInfo,
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@PathVariable Long id,
 		@Valid @RequestBody AdminStatusUpdateRequest request
 	) {
@@ -144,7 +145,7 @@ public class AdminController {
 	// 관리자 삭제(탈퇴)
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteAdmin(
-		@SessionAttribute("adminInfo") AdminInfo adminInfo,
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@PathVariable Long id
 	) {
 		adminService.deleteAdmin(adminInfo, id);

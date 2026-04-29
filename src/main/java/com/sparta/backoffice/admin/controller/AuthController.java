@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sparta.backoffice.admin.dto.AdminLoginRequest;
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.admin.service.AdminService;
+import com.sparta.backoffice.common.constant.SessionConst;
 import com.sparta.backoffice.common.dto.AdminInfo;
 
 import jakarta.servlet.http.HttpSession;
@@ -25,7 +26,7 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<Void> login(@RequestBody AdminLoginRequest request, HttpSession session) {
 		Admin admin = adminService.login(request);
-		session.setAttribute("adminInfo", new AdminInfo(
+		session.setAttribute(SessionConst.ADMIN_INFO, new AdminInfo(
 			admin.getId(),
 			admin.getEmail(),
 			admin.getRole()
