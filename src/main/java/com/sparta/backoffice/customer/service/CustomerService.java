@@ -1,9 +1,6 @@
 package com.sparta.backoffice.customer.service;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,24 +22,14 @@ public class CustomerService {
 
 	private final CustomerRepository customerRepository;
 
-	// 고객 전체 조회
+	//고객 전체 조회
 	@Transactional(readOnly = true)
 	public Page<CustomerGetResponse> getAll(CustomerGetRequest request) {
-		String sortBy = request.getSortBy() == null || request.getSortBy().isBlank()
-			? "createdAt" : request.getSortBy();
-		Sort.Direction sortOrder = "asc".equalsIgnoreCase(request.getSortOrder())
-			? Sort.Direction.ASC : Sort.Direction.DESC;
-
-		Pageable pageable = PageRequest.of(
-			request.getPage() - 1,
-			request.getSize(),
-			Sort.by(sortOrder, sortBy)
-		);
 
 		return customerRepository.searchCustomer(
 			request.getKeyword(),
 			request.getStatus(),
-			pageable
+			request.getPageable()
 		).map(CustomerGetResponse::from);
 
 	}
@@ -99,7 +86,6 @@ public class CustomerService {
 
 		customerRepository.delete(customer);
 	}
-
 
 	// 고객 검증
 	public Customer findCustomer(Long customerId) {
