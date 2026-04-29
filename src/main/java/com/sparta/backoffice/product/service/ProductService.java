@@ -1,11 +1,6 @@
 package com.sparta.backoffice.product.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,31 +44,11 @@ public class ProductService {
 
 	@Transactional(readOnly = true)
 	public Page<ProductGetAllResponse> getAll(ProductGetAllRequest request) {
-		String sortBy = request.getSortBy() == null || request.getSortBy().isBlank()
-			? "createdAt" : request.getSortBy();
-
-		List<String> allowedSort = List.of("price", "stock", "createdAt");
-		if (!allowedSort.contains(sortBy)) {
-			sortBy = "createdAt";
-		}
-
-		Sort.Direction direction = "asc".equalsIgnoreCase(request.getDirection())
-			? Sort.Direction.ASC : Sort.Direction.DESC;
-
-		Pageable pageable = PageRequest.of(
-			request.getPage() - 1, request.getSize(), Sort.by(direction, sortBy)
-		);
-
-		String keyword = request.getKeyword();
-		if (keyword != null && keyword.isBlank()) {
-			keyword = null;
-		}
-
 		return productRepository.searchProducts(
-			keyword,
+			request.getNormalizedKeyword(),
 			request.getCategory(),
 			request.getStatus(),
-			pageable
+			request.toPageable()
 		).map(ProductGetAllResponse::from);
 	}
 

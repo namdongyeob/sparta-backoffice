@@ -1,5 +1,9 @@
 package com.sparta.backoffice.product.dto;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 import com.sparta.backoffice.product.enums.ProductCategory;
 import com.sparta.backoffice.product.enums.ProductStatus;
 
@@ -32,4 +36,34 @@ public class ProductGetAllRequest {
 
 	private ProductCategory category; // 카테고리 필터
 	private ProductStatus status;     // 상태 필터
+
+	public Pageable toPageable() {
+		String sortField = (sortBy == null || sortBy.isBlank())
+			? "createdAt" : sortBy;
+
+		Sort sort;
+
+		if (direction == null || direction.isBlank()) {
+			// 기본 정렬
+			sort = Sort.by(
+				Sort.Order.desc(sortField)
+			);
+		} else {
+			Sort.Direction sortDirection =
+				"asc".equalsIgnoreCase(direction)
+					? Sort.Direction.ASC
+					: Sort.Direction.DESC;
+
+			sort = Sort.by(sortDirection, sortField);
+		}
+
+		return PageRequest.of(page - 1, size, sort);
+	}
+
+	public String getNormalizedKeyword() {
+		if (keyword == null || keyword.isBlank()) {
+			return null;
+		}
+		return keyword;
+	}
 }
