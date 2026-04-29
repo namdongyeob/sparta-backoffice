@@ -5,9 +5,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +52,7 @@ public class OrderService {
 		Customer customer = customerService.findCustomer(request.getCustomerId());
 		Admin admin = adminService.findAdmin(adminId);
 
-		product.decreaseStock(product.getStock() - request.getQuantity());
+		product.decreaseStock(request.getQuantity());
 
 		Order order = Order.createByAdmin(
 			generateOrderNumber(),
@@ -83,7 +80,7 @@ public class OrderService {
 
 		Customer customer = customerService.findCustomer(customerId);
 
-		product.decreaseStock(product.getStock() - request.getQuantity());
+		product.decreaseStock(request.getQuantity());
 
 		Order order = Order.createByCustomer(
 			generateOrderNumber(),
@@ -98,34 +95,11 @@ public class OrderService {
 	// 주문 전체 조회
 	@Transactional(readOnly = true)
 	public Page<OrderGetResponse> getAll(Long adminId, OrderGetAllRequest request) {
-		String sortBy = request.getSortBy() == null || request.getSortBy().isBlank()
-			? "createdAt" : request.getSortBy();
-
-		Sort sort;
-
-		if (request.getDirection() == null || request.getDirection().isBlank()) {
-			// 기본 정렬: 최신 날짜 먼저, 같은 날짜 안에서는 주문번호 빠른 순서
-			sort = Sort.by(
-				Sort.Order.desc("createdAt"),
-				Sort.Order.asc("orderNumber")
-			);
-		} else {
-			Sort.Direction direction = "asc".equalsIgnoreCase(request.getDirection())
-				? Sort.Direction.ASC : Sort.Direction.DESC;
-
-			sort = Sort.by(direction, sortBy);
-		}
-
-		Pageable pageable = PageRequest.of(
-			request.getPage() - 1,
-			request.getSize(),
-			sort
-		);
 
 		return orderRepository.searchOrders(
 			request.getKeyword(),
 			request.getStatus(),
-			pageable
+			request.getPageable()
 		).map(OrderGetResponse::from);
 	}
 

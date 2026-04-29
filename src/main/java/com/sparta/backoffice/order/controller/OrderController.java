@@ -82,7 +82,7 @@ public class OrderController {
 	}
 
 	// 주문 취소
-	@PatchMapping("/orders/{orderId}/cancle")
+	@PatchMapping("/orders/{orderId}/cancel")
 	public ResponseEntity<Void> cancelOrder(
 		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@PathVariable Long orderId,
