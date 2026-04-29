@@ -52,8 +52,6 @@ public class Admin extends BaseEntity {
 
 	private String rejectionReason;
 
-	private LocalDateTime deletedAt;
-
 	public Admin(String name, String email, String password,
 		String phoneNumber, AdminRole role) {
 		this.name = name;
