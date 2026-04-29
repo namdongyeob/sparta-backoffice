@@ -1,7 +1,5 @@
 package com.sparta.backoffice.order.entity;
 
-import java.time.LocalDateTime;
-
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -79,10 +77,9 @@ public class Order extends BaseEntity {
 		this.customer = customer;
 		this.product = product;
 		this.admin = admin;
-		LocalDateTime createdAt = this.getCreatedAt();
 	}
 
-	public static Order createAdmin(
+	public static Order createByAdmin(
 		String orderNumber,
 		int quantity,
 		Customer customer,
@@ -104,7 +101,7 @@ public class Order extends BaseEntity {
 		);
 	}
 
-	public static Order createCustomer(
+	public static Order createByCustomer(
 		String orderNumber,
 		int quantity,
 		Customer customer,
@@ -148,10 +145,6 @@ public class Order extends BaseEntity {
 	public void cancel(String cancelReason) {
 		if (this.status != OrderStatus.PREPARING) {
 			throw new IllegalArgumentException("준비중 상태만 취소 가능합니다.");
-		}
-
-		if (cancelReason == null || cancelReason.isBlank()) {
-			throw new IllegalArgumentException("주문 취소 사유는 필수입니다.");
 		}
 
 		this.status = OrderStatus.CANCELLED;
