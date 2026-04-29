@@ -21,20 +21,30 @@ public class OrderGetAllRequest {
 	private OrderStatus status;   // 상태 필터
 
 	public Pageable getPageable() {
-		Sort sort;
+		String sortField = (sortBy == null || sortBy.isBlank())
+			? "createdAt"
+			: sortBy;
+
+		Sort.Direction sortDirection;
 
 		if (direction == null || direction.isBlank()) {
+			sortDirection = Sort.Direction.DESC;
+		} else {
+			sortDirection = "asc".equalsIgnoreCase(direction)
+				? Sort.Direction.ASC
+				: Sort.Direction.DESC;
+		}
+
+		Sort sort;
+
+		// 기본 정렬: 최신순 + 같은 시간에서는 주문번호 순서
+		if ("createdAt".equals(sortField)) {
 			sort = Sort.by(
 				Sort.Order.desc("createdAt"),
 				Sort.Order.asc("orderNumber")
 			);
 		} else {
-			Sort.Direction sortDirection =
-				"asc".equalsIgnoreCase(direction)
-					? Sort.Direction.ASC
-					: Sort.Direction.DESC;
-
-			sort = Sort.by(sortDirection, sortBy);
+			sort = Sort.by(sortDirection, sortField);
 		}
 
 		return PageRequest.of(

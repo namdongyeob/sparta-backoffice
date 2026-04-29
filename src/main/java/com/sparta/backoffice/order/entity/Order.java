@@ -35,7 +35,7 @@ public class Order extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false, unique = true, length = 25)
 	private String orderNumber;
 
 	@Column(nullable = false)
@@ -125,10 +125,10 @@ public class Order extends BaseEntity {
 	// 주문 상태 수정 (준비중 → 배송중 → 배송완료)
 	public void updateStatus(OrderStatus status) {
 		if (this.status == OrderStatus.CANCELLED) {
-			throw new IllegalArgumentException("취소된 주문은 변경 불가");
+			throw new IllegalArgumentException("취소된 주문은 변경 불가합니다.");
 		}
 		if (this.status == OrderStatus.DELIVERED) {
-			throw new IllegalArgumentException("배송완료 주문은 변경 불가");
+			throw new IllegalArgumentException("배송완료 주문은 변경 불가합니다.");
 		}
 		if (this.status == OrderStatus.PREPARING && status == OrderStatus.SHIPPING) {
 			this.status = status;
@@ -138,7 +138,7 @@ public class Order extends BaseEntity {
 			this.status = status;
 			return;
 		}
-		throw new IllegalArgumentException("잘못된 상태 변경");
+		throw new IllegalArgumentException("잘못된 상태 변경입니다.");
 	}
 
 	// 주문 취소
