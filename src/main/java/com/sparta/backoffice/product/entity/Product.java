@@ -71,7 +71,6 @@ public class Product extends BaseEntity {
 
 	public void updateInfo(String name, ProductCategory category, Integer price) {
 		if (name != null) {
-			validateName(name);
 			this.name = name;
 		}
 
@@ -80,7 +79,6 @@ public class Product extends BaseEntity {
 		}
 
 		if (price != null) {
-			validatePrice(price);
 			this.price = price;
 		}
 	}
@@ -93,7 +91,7 @@ public class Product extends BaseEntity {
 
 	private void validatePrice(int price) {
 		if (price < 1) {
-			throw new IllegalArgumentException("가격은 0 이상이어야 합니다.");
+			throw new IllegalArgumentException("가격은 1원 이상이어야 합니다.");
 		}
 	}
 
@@ -139,16 +137,16 @@ public class Product extends BaseEntity {
 	}
 
 	public void decreaseStock(int quantity) {
+		if (quantity <= 0) {
+			throw new IllegalArgumentException("수량은 1개 이상이어야 합니다.");
+		}
+
 		if (this.status == ProductStatus.DISCONTINUED) {
 			throw new IllegalStateException("단종 상품은 주문할 수 없습니다.");
 		}
 
 		if (this.status == ProductStatus.SOLD_OUT) {
 			throw new IllegalStateException("품절 상품은 주문할 수 없습니다.");
-		}
-
-		if (quantity <= 0) {
-			throw new IllegalArgumentException("수량은 1개 이상이어야 합니다.");
 		}
 
 		if (this.stock < quantity) {

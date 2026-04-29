@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
+import com.sparta.backoffice.common.constant.SessionConst;
+import com.sparta.backoffice.common.dto.AdminInfo;
 import com.sparta.backoffice.product.dto.ProductCreateRequest;
 import com.sparta.backoffice.product.dto.ProductCreateResponse;
 import com.sparta.backoffice.product.dto.ProductGetAllRequest;
@@ -26,7 +29,6 @@ import com.sparta.backoffice.product.dto.ProductUpdateStockRequest;
 import com.sparta.backoffice.product.dto.ProductUpdateStockResponse;
 import com.sparta.backoffice.product.service.ProductService;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -39,11 +41,10 @@ public class ProductController {
 
 	@PostMapping
 	public ResponseEntity<ProductCreateResponse> create(
-		HttpSession session,
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@Valid @RequestBody ProductCreateRequest request
 	) {
-		Long adminId = (Long)session.getAttribute("adminId");
-		return ResponseEntity.status(HttpStatus.CREATED).body(productService.create(adminId, request));
+		return ResponseEntity.status(HttpStatus.CREATED).body(productService.create(adminInfo.getId(), request));
 	}
 
 	@GetMapping
@@ -62,41 +63,37 @@ public class ProductController {
 
 	@PatchMapping("/{productId}")
 	public ResponseEntity<ProductUpdateResponse> update(
-		HttpSession session,
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@PathVariable Long productId,
 		@Valid @RequestBody ProductUpdateRequest request
 	) {
-		Long adminId = (Long)session.getAttribute("adminId");
-		return ResponseEntity.status(HttpStatus.OK).body(productService.update(adminId, productId, request));
+		return ResponseEntity.status(HttpStatus.OK).body(productService.update(adminInfo.getId(), productId, request));
 	}
 
 	@PatchMapping("/{productId}/stock")
 	public ResponseEntity<ProductUpdateStockResponse> updateStock(
-		HttpSession session,
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@PathVariable Long productId,
 		@Valid @RequestBody ProductUpdateStockRequest request
 	) {
-		Long adminId = (Long)session.getAttribute("adminId");
-		return ResponseEntity.status(HttpStatus.OK).body(productService.updateStock(adminId, productId, request));
+		return ResponseEntity.status(HttpStatus.OK).body(productService.updateStock(adminInfo.getId(), productId, request));
 	}
 
 	@PatchMapping("/{productId}/status")
 	public ResponseEntity<ProductUpdateStatusResponse> updateStatus(
-		HttpSession session,
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@PathVariable Long productId,
 		@Valid @RequestBody ProductUpdateStatusRequest request
 	) {
-		Long adminId = (Long)session.getAttribute("adminId");
-		return ResponseEntity.status(HttpStatus.OK).body(productService.updateStatus(adminId, productId, request));
+		return ResponseEntity.status(HttpStatus.OK).body(productService.updateStatus(adminInfo.getId(), productId, request));
 	}
 
 	@DeleteMapping("/{productId}")
 	public ResponseEntity<Void> delete(
-		HttpSession session,
+		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@PathVariable Long productId
 	) {
-		Long adminId = (Long)session.getAttribute("adminId");
-		productService.delete(adminId, productId);
+		productService.delete(adminInfo.getId(), productId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
