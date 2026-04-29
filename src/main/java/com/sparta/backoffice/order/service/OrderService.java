@@ -1,8 +1,8 @@
 package com.sparta.backoffice.order.service;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -139,14 +139,9 @@ public class OrderService {
 
 	// 주문번호 생성
 	private String generateOrderNumber() {
-		LocalDate today = LocalDate.now();
-		String date = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+		String date = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+		String uuid = UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
 
-		long count = orderRepository.countByCreatedAtBetween(
-			today.atStartOfDay(),
-			today.atTime(LocalTime.MAX)
-		);
-
-		return date + "-" + String.format("%03d", count + 1);
+		return date + "-" + uuid;
 	}
 }
