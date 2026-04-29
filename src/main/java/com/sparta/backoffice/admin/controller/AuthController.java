@@ -14,6 +14,7 @@ import com.sparta.backoffice.common.constant.SessionConst;
 import com.sparta.backoffice.common.dto.AdminInfo;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,7 +25,7 @@ public class AuthController {
 
 	// 관리자 로그인
 	@PostMapping("/login")
-	public ResponseEntity<Void> login(@RequestBody AdminLoginRequest request, HttpSession session) {
+	public ResponseEntity<Void> login(@Valid @RequestBody AdminLoginRequest request, HttpSession session) {
 		Admin admin = adminService.login(request);
 		session.setAttribute(SessionConst.ADMIN_INFO, new AdminInfo(
 			admin.getId(),
