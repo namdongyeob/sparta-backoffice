@@ -8,7 +8,10 @@ import com.sparta.backoffice.customer.enums.CustomerStatus;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+//todo PageableDefault + @RequestParam 으로 수정 예정
+@Setter
 @Getter
 @NoArgsConstructor
 public class CustomerGetRequest {
