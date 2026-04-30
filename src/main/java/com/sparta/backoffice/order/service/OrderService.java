@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.admin.service.AdminService;
+import com.sparta.backoffice.common.exception.CustomException;
+import com.sparta.backoffice.common.exception.ErrorCode;
 import com.sparta.backoffice.customer.entity.Customer;
 import com.sparta.backoffice.customer.service.CustomerService;
 import com.sparta.backoffice.order.dto.OrderCancelRequest;
@@ -43,10 +45,10 @@ public class OrderService {
 
 		// 상품 상태 검증
 		if (product.getStatus() == ProductStatus.DISCONTINUED) {
-			throw new IllegalArgumentException("단종된 상품은 주문할 수 없습니다.");
+			throw new CustomException(ErrorCode.PRODUCT_DISCONTINUED);
 		}
 		if (product.getStatus() == ProductStatus.SOLD_OUT) {
-			throw new IllegalArgumentException("품절된 상품은 주문할 수 없습니다.");
+			throw new CustomException(ErrorCode.PRODUCT_SOLD_OUT);
 		}
 
 		Customer customer = customerService.findCustomer(request.getCustomerId());
@@ -72,10 +74,10 @@ public class OrderService {
 
 		// 상품 상태 검증
 		if (product.getStatus() == ProductStatus.DISCONTINUED) {
-			throw new IllegalArgumentException("단종된 상품은 주문할 수 없습니다.");
+			throw new CustomException(ErrorCode.PRODUCT_DISCONTINUED);
 		}
 		if (product.getStatus() == ProductStatus.SOLD_OUT) {
-			throw new IllegalArgumentException("품절된 상품은 주문할 수 없습니다.");
+			throw new CustomException(ErrorCode.PRODUCT_SOLD_OUT);
 		}
 
 		Customer customer = customerService.findCustomer(customerId);
@@ -134,7 +136,7 @@ public class OrderService {
 	// 주문 검증
 	public Order findOrder(Long orderId) {
 		return orderRepository.findById(orderId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 	}
 
 	// 주문번호 생성

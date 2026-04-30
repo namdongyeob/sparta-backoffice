@@ -12,8 +12,8 @@ import com.sparta.backoffice.admin.dto.AdminPasswordUpdateRequest;
 import com.sparta.backoffice.admin.dto.AdminRejectRequest;
 import com.sparta.backoffice.admin.dto.AdminRoleUpdateRequest;
 import com.sparta.backoffice.admin.dto.AdminRoleUpdateResponse;
-import com.sparta.backoffice.admin.dto.AdminSignupResponse;
 import com.sparta.backoffice.admin.dto.AdminSignupRequest;
+import com.sparta.backoffice.admin.dto.AdminSignupResponse;
 import com.sparta.backoffice.admin.dto.AdminStatusUpdateRequest;
 import com.sparta.backoffice.admin.dto.AdminStatusUpdateResponse;
 import com.sparta.backoffice.admin.dto.AdminUpdateMeRequest;
@@ -26,6 +26,8 @@ import com.sparta.backoffice.admin.enums.AdminStatus;
 import com.sparta.backoffice.admin.repository.AdminRepository;
 import com.sparta.backoffice.common.config.PasswordEncoder;
 import com.sparta.backoffice.common.dto.AdminInfo;
+import com.sparta.backoffice.common.exception.CustomException;
+import com.sparta.backoffice.common.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +41,7 @@ public class AdminService {
 	@Transactional
 	public AdminSignupResponse signup(AdminSignupRequest request) {
 		if (adminRepository.existsByEmail(request.getEmail())) {
-			throw new IllegalArgumentException("이미 사용중인 이메일입니다.");
+			throw new CustomException(ErrorCode.ADMIN_EMAIL_DUPLICATED);
 		}
 		String encodedPassword = passwordEncoder.encode(request.getPassword());
 		Admin admin = request.toEntity(encodedPassword);
@@ -51,17 +53,17 @@ public class AdminService {
 	@Transactional(readOnly = true)
 	public Admin login(AdminLoginRequest request) {
 		Admin admin = adminRepository.findByEmail(request.getEmail()).orElseThrow(
-			() -> new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다."));
+			() -> new CustomException(ErrorCode.ADMIN_INVALID_CREDENTIALS));
 		if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
-			throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
+			throw new CustomException(ErrorCode.ADMIN_INVALID_CREDENTIALS);
 		}
-		if (admin.getStatus() != AdminStatus.ACTIVE){
+		if (admin.getStatus() != AdminStatus.ACTIVE) {
 			switch (admin.getStatus()) {
-				case PENDING -> throw new IllegalArgumentException("승인 대기 중인 계정입니다.");
-				case REJECTED -> throw new IllegalArgumentException("거부된 계정입니다.");
-				case SUSPENDED -> throw new IllegalArgumentException("정지된 계정입니다.");
-				case INACTIVE -> throw new IllegalArgumentException("비활성화된 계정입니다.");
-				default ->  throw new IllegalArgumentException("로그인 할수 없는 계정입니다.");
+				case PENDING -> throw new CustomException(ErrorCode.ADMIN_PENDING);
+				case REJECTED -> throw new CustomException(ErrorCode.ADMIN_REJECTED);
+				case SUSPENDED -> throw new CustomException(ErrorCode.ADMIN_SUSPENDED);
+				case INACTIVE -> throw new CustomException(ErrorCode.ADMIN_INACTIVE);
+				default -> throw new CustomException(ErrorCode.ADMIN_LOGIN_NOT_ALLOWED);
 			}
 		}
 
@@ -101,7 +103,7 @@ public class AdminService {
 		validateSuperAdmin(adminInfo);
 		Admin admin = findAdmin(adminId);
 		if (admin.getStatus() != AdminStatus.PENDING) {
-			throw new IllegalStateException("승인 대기 중인 관리자만 승인할 수 있습니다.");
+			throw new CustomException(ErrorCode.ADMIN_INVALID_STATUS);
 		}
 		admin.approve();
 		return AdminGetResponse.from(admin);
@@ -113,7 +115,7 @@ public class AdminService {
 		validateSuperAdmin(adminInfo);
 		Admin admin = findAdmin(adminId);
 		if (admin.getStatus() != AdminStatus.PENDING) {
-			throw new IllegalStateException("승인 대기 중인 관리자만 거절할 수 있습니다.");
+			throw new CustomException(ErrorCode.ADMIN_INVALID_STATUS);
 		}
 		admin.reject(request.getRejectionReason());
 		return AdminGetResponse.from(admin);
@@ -126,7 +128,7 @@ public class AdminService {
 		String newEmail = request.getEmail();
 		if (newEmail != null && !newEmail.isBlank() && !newEmail.equals(admin.getEmail())) {
 			if (adminRepository.existsByEmail(newEmail)) {
-				throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+				throw new CustomException(ErrorCode.CUSTOMER_EMAIL_DUPLICATED);
 			}
 		}
 		admin.updateInfo(request.getName(), newEmail, request.getPhoneNumber());
@@ -147,10 +149,10 @@ public class AdminService {
 	public void updatePassword(AdminInfo adminInfo, AdminPasswordUpdateRequest request) {
 		Admin admin = findAdmin(adminInfo.getId());
 		if (!passwordEncoder.matches(request.getCurrentPassword(), admin.getPassword())) {
-			throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+			throw new CustomException(ErrorCode.ADMIN_PASSWORD_MISMATCH);
 		}
 		if (request.getCurrentPassword().equals(request.getNewPassword())) {
-			throw new IllegalArgumentException("새 비밀번호는 기존 비밀번호와 달라야 합니다.");
+			throw new CustomException(ErrorCode.ADMIN_SAME_PASSWORD);
 		}
 		admin.updatePassword(passwordEncoder.encode(request.getNewPassword()));
 	}
@@ -163,7 +165,7 @@ public class AdminService {
 		String newEmail = request.getEmail();
 		if (newEmail != null && !newEmail.isBlank() && !newEmail.equals(admin.getEmail())) {
 			if (adminRepository.existsByEmail(newEmail)) {
-				throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+				throw new CustomException(ErrorCode.CUSTOMER_EMAIL_DUPLICATED);
 			}
 		}
 		admin.updateInfo(request.getName(), newEmail, request.getPhoneNumber());
@@ -190,13 +192,13 @@ public class AdminService {
 
 	// 공통 오류
 	public Admin findAdmin(Long adminId) {
-		return adminRepository.findById(adminId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다."));
+		return adminRepository.findById(adminId).orElseThrow(
+			() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 	}
 
 	public void validateSuperAdmin(AdminInfo adminInfo) {
 		if (adminInfo.getAdminRole() != AdminRole.SUPER_ADMIN) {
-			throw new IllegalArgumentException("슈퍼 관리자만 접근 가능합니다.");
+			throw new CustomException(ErrorCode.ADMIN_ACCESS_DENIED);
 		}
 	}
 }

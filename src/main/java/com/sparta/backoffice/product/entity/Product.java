@@ -5,6 +5,8 @@ import org.hibernate.annotations.SQLRestriction;
 
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.common.entity.BaseEntity;
+import com.sparta.backoffice.common.exception.CustomException;
+import com.sparta.backoffice.common.exception.ErrorCode;
 import com.sparta.backoffice.product.enums.ProductCategory;
 import com.sparta.backoffice.product.enums.ProductStatus;
 
@@ -85,19 +87,19 @@ public class Product extends BaseEntity {
 
 	private void validateName(String name) {
 		if (name == null || name.isBlank()) {
-			throw new IllegalArgumentException("상품명은 비어있을 수 없습니다.");
+			throw new CustomException(ErrorCode.PRODUCT_INVALID_NAME);
 		}
 	}
 
 	private void validatePrice(int price) {
 		if (price < 1) {
-			throw new IllegalArgumentException("가격은 1원 이상이어야 합니다.");
+			throw new CustomException(ErrorCode.PRODUCT_INVALID_PRICE);
 		}
 	}
 
 	private void validateStock(int stock) {
 		if (stock < 0) {
-			throw new IllegalArgumentException("재고는 0 이상이어야 합니다.");
+			throw new CustomException(ErrorCode.PRODUCT_INVALID_STOCK);
 		}
 	}
 
@@ -118,7 +120,7 @@ public class Product extends BaseEntity {
 
 	public void updateStatus(ProductStatus status) {
 		if (this.status == ProductStatus.DISCONTINUED) {
-			throw new IllegalStateException("단종 상품은 상태를 변경할 수 없습니다.");
+			throw new CustomException(ErrorCode.PRODUCT_STATUS_CHANGE_NOT_ALLOWED);
 		}
 
 		this.status = status;
@@ -126,7 +128,7 @@ public class Product extends BaseEntity {
 
 	public void increaseStock(int quantity) {
 		if (quantity <= 0) {
-			throw new IllegalArgumentException("수량은 1개 이상이어야 합니다.");
+			throw new CustomException(ErrorCode.PRODUCT_INVALID_QUANTITY);
 		}
 
 		this.stock += quantity;
@@ -138,19 +140,19 @@ public class Product extends BaseEntity {
 
 	public void decreaseStock(int quantity) {
 		if (quantity <= 0) {
-			throw new IllegalArgumentException("수량은 1개 이상이어야 합니다.");
+			throw new CustomException(ErrorCode.PRODUCT_INVALID_QUANTITY);
 		}
 
 		if (this.status == ProductStatus.DISCONTINUED) {
-			throw new IllegalStateException("단종 상품은 주문할 수 없습니다.");
+			throw new CustomException(ErrorCode.PRODUCT_DISCONTINUED);
 		}
 
 		if (this.status == ProductStatus.SOLD_OUT) {
-			throw new IllegalStateException("품절 상품은 주문할 수 없습니다.");
+			throw new CustomException(ErrorCode.PRODUCT_SOLD_OUT);
 		}
 
 		if (this.stock < quantity) {
-			throw new IllegalArgumentException("재고가 부족합니다.");
+			throw new CustomException(ErrorCode.PRODUCT_INSUFFICIENT_STOCK);
 		}
 
 		this.stock -= quantity;

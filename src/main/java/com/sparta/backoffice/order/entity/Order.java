@@ -5,6 +5,8 @@ import org.hibernate.annotations.SQLRestriction;
 
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.common.entity.BaseEntity;
+import com.sparta.backoffice.common.exception.CustomException;
+import com.sparta.backoffice.common.exception.ErrorCode;
 import com.sparta.backoffice.customer.entity.Customer;
 import com.sparta.backoffice.order.enums.OrderStatus;
 import com.sparta.backoffice.product.entity.Product;
@@ -125,10 +127,10 @@ public class Order extends BaseEntity {
 	// 주문 상태 수정 (준비중 → 배송중 → 배송완료)
 	public void updateStatus(OrderStatus status) {
 		if (this.status == OrderStatus.CANCELLED) {
-			throw new IllegalArgumentException("취소된 주문은 변경 불가합니다.");
+			throw new CustomException(ErrorCode.ORDER_ALREADY_CANCELED);
 		}
 		if (this.status == OrderStatus.DELIVERED) {
-			throw new IllegalArgumentException("배송완료 주문은 변경 불가합니다.");
+			throw new CustomException(ErrorCode.ORDER_ALREADY_DELIVERED);
 		}
 		if (this.status == OrderStatus.PREPARING && status == OrderStatus.SHIPPING) {
 			this.status = status;
@@ -138,18 +140,16 @@ public class Order extends BaseEntity {
 			this.status = status;
 			return;
 		}
-		throw new IllegalArgumentException("잘못된 상태 변경입니다.");
+		throw new CustomException(ErrorCode.ORDER_INVALID_STATUS);
 	}
 
 	// 주문 취소
 	public void cancel(String cancelReason) {
 		if (this.status != OrderStatus.PREPARING) {
-			throw new IllegalArgumentException("준비중 상태만 취소 가능합니다.");
+			throw new CustomException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
 		}
 
 		this.status = OrderStatus.CANCELLED;
 		this.cancelReason = cancelReason;
 	}
 }
-
-
