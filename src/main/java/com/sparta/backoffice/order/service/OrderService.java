@@ -96,7 +96,7 @@ public class OrderService {
 
 	// 주문 전체 조회
 	@Transactional(readOnly = true)
-	public Page<OrderGetResponse> getAll(Long adminId, OrderGetAllRequest request) {
+	public Page<OrderGetResponse> getAll(OrderGetAllRequest request) {
 
 		return orderRepository.searchOrders(
 			request.getKeyword(),
@@ -107,7 +107,7 @@ public class OrderService {
 
 	// 주문 상세 조회
 	@Transactional(readOnly = true)
-	public OrderGetResponse getOne(Long adminId, Long orderId) {
+	public OrderGetResponse getOne(Long orderId) {
 		Order order = findOrder(orderId);
 
 		return OrderGetResponse.from(order);
@@ -115,7 +115,7 @@ public class OrderService {
 
 	// 주문 상태 수정
 	@Transactional
-	public OrderStatusUpdateResponse updateStatus(Long adminId, Long orderId, OrderStatusUpdateRequest request) {
+	public OrderStatusUpdateResponse updateStatus(Long orderId, OrderStatusUpdateRequest request) {
 		Order order = findOrder(orderId);
 		order.updateStatus(request.getStatus());
 
@@ -124,7 +124,7 @@ public class OrderService {
 
 	// 주문 취소
 	@Transactional
-	public void cancel(Long adminId, Long orderId, OrderCancelRequest request) {
+	public void cancel(Long orderId, OrderCancelRequest request) {
 		Order order = findOrder(orderId);
 		order.cancel(request.getCancelReason());
 

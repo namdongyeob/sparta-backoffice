@@ -58,7 +58,7 @@ public class OrderController {
 		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@ModelAttribute OrderGetAllRequest request
 	) {
-		return ResponseEntity.status(HttpStatus.OK).body(orderService.getAll(adminInfo.getId(), request));
+		return ResponseEntity.status(HttpStatus.OK).body(orderService.getAll(request));
 	}
 
 	// 주문 상세 조회
@@ -67,7 +67,7 @@ public class OrderController {
 		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
 		@PathVariable Long orderId
 	) {
-		return ResponseEntity.status(HttpStatus.OK).body(orderService.getOne(adminInfo.getId(), orderId));
+		return ResponseEntity.status(HttpStatus.OK).body(orderService.getOne(orderId));
 	}
 
 	// 주문 상태 수정
@@ -78,7 +78,7 @@ public class OrderController {
 		@Valid @RequestBody OrderStatusUpdateRequest request
 	) {
 		return ResponseEntity.status(HttpStatus.OK)
-			.body(orderService.updateStatus(adminInfo.getId(), orderId, request));
+			.body(orderService.updateStatus(orderId, request));
 	}
 
 	// 주문 취소
@@ -88,7 +88,7 @@ public class OrderController {
 		@PathVariable Long orderId,
 		@Valid @RequestBody OrderCancelRequest request
 	) {
-		orderService.cancel(adminInfo.getId(), orderId, request);
+		orderService.cancel(orderId, request);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
