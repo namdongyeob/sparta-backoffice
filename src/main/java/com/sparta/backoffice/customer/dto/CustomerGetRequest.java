@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-//todo PageableDefault + @RequsetParm 으로 수정 예정
+//todo PageableDefault + @RequestParam 으로 수정 예정
 @Setter
 @Getter
 @NoArgsConstructor
