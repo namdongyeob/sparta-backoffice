@@ -65,7 +65,7 @@ public class ReviewService {
 	@Transactional
 	public void deleteReview(AdminInfo adminInfo, Long id) {
 		if (adminInfo.getAdminRole() == AdminRole.CS_ADMIN) {
-			throw new CustomException(ErrorCode.ADMIN_ACCESS_DENIED);
+			throw new CustomException(ErrorCode.REVIEW_UNAUTHORIZED);
 		}
 		Review review = reviewRepository.findById(id)
 			.orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
