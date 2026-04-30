@@ -1,5 +1,6 @@
 package com.sparta.backoffice.common.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -18,4 +19,7 @@ public class BaseEntity {
 
     @LastModifiedDate
     private LocalDateTime modifiedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }

@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sparta.backoffice.common.exception.CustomException;
+import com.sparta.backoffice.common.exception.ErrorCode;
 import com.sparta.backoffice.customer.dto.CustomerGetOneResponse;
 import com.sparta.backoffice.customer.dto.CustomerGetRequest;
 import com.sparta.backoffice.customer.dto.CustomerGetResponse;
@@ -54,13 +56,13 @@ public class CustomerService {
 
 		if (!customer.getEmail().equals(request.getEmail())) {
 			if (customerRepository.existsByEmail(request.getEmail())) {
-				throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+				throw new CustomException(ErrorCode.CUSTOMER_EMAIL_DUPLICATED);
 			}
 		}
 
 		if (!customer.getPhoneNumber().equals(request.getPhoneNumber())) {
 			if (customerRepository.existsByPhoneNumber(request.getPhoneNumber())) {
-				throw new IllegalArgumentException("이미 존재하는 휴대폰 번호입니다.");
+				throw new CustomException(ErrorCode.CUSTOMER_PHONE_NUMBER_DUPLICATED);
 			}
 		}
 		customer.updateInfo(
@@ -95,10 +97,8 @@ public class CustomerService {
 	// 고객 검증
 	public Customer findCustomer(Long customerId) {
 		return customerRepository.findById(customerId).orElseThrow(
-			() -> new IllegalArgumentException("존재하지 않는 고객입니다.")
+			() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND)
 		);
 	}
 
 }
-
-

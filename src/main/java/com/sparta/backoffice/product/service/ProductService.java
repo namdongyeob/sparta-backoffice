@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.admin.repository.AdminRepository;
+import com.sparta.backoffice.common.exception.CustomException;
+import com.sparta.backoffice.common.exception.ErrorCode;
 import com.sparta.backoffice.product.dto.ProductCreateRequest;
 import com.sparta.backoffice.product.dto.ProductCreateResponse;
 import com.sparta.backoffice.product.dto.ProductGetAllRequest;
@@ -33,7 +35,7 @@ public class ProductService {
 	public ProductCreateResponse create(Long adminId, ProductCreateRequest request) {
 
 		Admin admin = adminRepository.findById(adminId).orElseThrow(
-			() -> new IllegalArgumentException("관리자를 찾을 수 없습니다."));
+			() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
 		Product product = request.toEntity(admin);
 
@@ -110,13 +112,13 @@ public class ProductService {
 	}
 
 	public Product findProduct(Long productId) {
-		return productRepository.findById(productId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+		return productRepository.findById(productId).orElseThrow(
+			() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 	}
 
 	private void validateAdmin(Long adminId) {
 		if (!adminRepository.existsById(adminId)) {
-			throw new IllegalArgumentException("존재하지 않는 관리자입니다.");
+			throw new CustomException(ErrorCode.ADMIN_NOT_FOUND);
 		}
 	}
 }

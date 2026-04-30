@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.backoffice.admin.enums.AdminRole;
 import com.sparta.backoffice.common.dto.AdminInfo;
+import com.sparta.backoffice.common.exception.CustomException;
+import com.sparta.backoffice.common.exception.ErrorCode;
 import com.sparta.backoffice.review.dto.ReviewGetAllRequest;
 import com.sparta.backoffice.review.dto.ReviewGetAllResponse;
 import com.sparta.backoffice.review.dto.ReviewGetOneResponse;
@@ -34,7 +36,7 @@ public class ReviewService {
 	@Transactional(readOnly = true)
 	public ReviewGetOneResponse getReview(Long id) {
 		Review review = reviewRepository.findById(id)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않은 리뷰입니다."));
+			.orElseThrow(() ->  new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 		return ReviewGetOneResponse.from(review);
 	}
 
@@ -45,7 +47,7 @@ public class ReviewService {
 			throw new IllegalArgumentException("삭제 권한이 없습니다.");
 		}
 		Review review = reviewRepository.findById(id)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않은 리뷰입니다."));
+			.orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 		reviewRepository.delete(review);
 	}
 }
