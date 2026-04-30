@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.backoffice.admin.entity.Admin;
 import com.sparta.backoffice.admin.service.AdminService;
+import com.sparta.backoffice.common.exception.CustomException;
+import com.sparta.backoffice.common.exception.ErrorCode;
 import com.sparta.backoffice.customer.entity.Customer;
 import com.sparta.backoffice.customer.service.CustomerService;
 import com.sparta.backoffice.order.dto.OrderCancelRequest;
@@ -43,10 +45,10 @@ public class OrderService {
 
 		// 상품 상태 검증
 		if (product.getStatus() == ProductStatus.DISCONTINUED) {
-			throw new IllegalArgumentException("단종된 상품은 주문할 수 없습니다.");
+			throw new CustomException(ErrorCode.PRODUCT_DISCONTINUED);
 		}
 		if (product.getStatus() == ProductStatus.SOLD_OUT) {
-			throw new IllegalArgumentException("품절된 상품은 주문할 수 없습니다.");
+			throw new CustomException(ErrorCode.PRODUCT_SOLD_OUT);
 		}
 
 		Customer customer = customerService.findCustomer(request.getCustomerId());
@@ -72,10 +74,10 @@ public class OrderService {
 
 		// 상품 상태 검증
 		if (product.getStatus() == ProductStatus.DISCONTINUED) {
-			throw new IllegalArgumentException("단종된 상품은 주문할 수 없습니다.");
+			throw new CustomException(ErrorCode.PRODUCT_DISCONTINUED);
 		}
 		if (product.getStatus() == ProductStatus.SOLD_OUT) {
-			throw new IllegalArgumentException("품절된 상품은 주문할 수 없습니다.");
+			throw new CustomException(ErrorCode.PRODUCT_SOLD_OUT);
 		}
 
 		Customer customer = customerService.findCustomer(customerId);
@@ -94,7 +96,7 @@ public class OrderService {
 
 	// 주문 전체 조회
 	@Transactional(readOnly = true)
-	public Page<OrderGetResponse> getAll(Long adminId, OrderGetAllRequest request) {
+	public Page<OrderGetResponse> getAll(OrderGetAllRequest request) {
 
 		return orderRepository.searchOrders(
 			request.getKeyword(),
@@ -105,7 +107,7 @@ public class OrderService {
 
 	// 주문 상세 조회
 	@Transactional(readOnly = true)
-	public OrderGetResponse getOne(Long adminId, Long orderId) {
+	public OrderGetResponse getOne(Long orderId) {
 		Order order = findOrder(orderId);
 
 		return OrderGetResponse.from(order);
@@ -113,7 +115,7 @@ public class OrderService {
 
 	// 주문 상태 수정
 	@Transactional
-	public OrderStatusUpdateResponse updateStatus(Long adminId, Long orderId, OrderStatusUpdateRequest request) {
+	public OrderStatusUpdateResponse updateStatus(Long orderId, OrderStatusUpdateRequest request) {
 		Order order = findOrder(orderId);
 		order.updateStatus(request.getStatus());
 
@@ -122,7 +124,7 @@ public class OrderService {
 
 	// 주문 취소
 	@Transactional
-	public void cancel(Long adminId, Long orderId, OrderCancelRequest request) {
+	public void cancel(Long orderId, OrderCancelRequest request) {
 		Order order = findOrder(orderId);
 		order.cancel(request.getCancelReason());
 
@@ -134,7 +136,7 @@ public class OrderService {
 	// 주문 검증
 	public Order findOrder(Long orderId) {
 		return orderRepository.findById(orderId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 	}
 
 	// 주문번호 생성
