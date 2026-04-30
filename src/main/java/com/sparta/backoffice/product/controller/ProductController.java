@@ -32,6 +32,9 @@ import com.sparta.backoffice.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 상품 관련 API를 처리하는 컨트롤러 클래스
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/products")
@@ -39,6 +42,13 @@ public class ProductController {
 
 	private final ProductService productService;
 
+	/**
+	 * 새로운 상품을 등록합니다. (관리자 권한 필요)
+	 *
+	 * @param adminInfo 로그인한 관리자 정보
+	 * @param request   상품 생성 요청 정보
+	 * @return 생성된 상품 정보와 함께 상태 코드 201 (Created)
+	 */
 	@PostMapping
 	public ResponseEntity<ProductCreateResponse> create(
 		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
@@ -47,6 +57,12 @@ public class ProductController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(productService.create(adminInfo.getId(), request));
 	}
 
+	/**
+	 * 상품 목록을 페이징 및 필터링하여 조회합니다.
+	 *
+	 * @param request 조회 조건 (페이징, 필터링)
+	 * @return 상품 목록 페이지와 함께 상태 코드 200 (OK)
+	 */
 	@GetMapping
 	public ResponseEntity<Page<ProductGetAllResponse>> getProducts(
 		@Valid @ModelAttribute ProductGetAllRequest request
@@ -54,6 +70,12 @@ public class ProductController {
 		return ResponseEntity.status(HttpStatus.OK).body(productService.getAll(request));
 	}
 
+	/**
+	 * 특정 상품의 상세 정보를 조회합니다.
+	 *
+	 * @param productId 조회할 상품 ID
+	 * @return 상품 상세 정보와 함께 상태 코드 200 (OK)
+	 */
 	@GetMapping("/{productId}")
 	public ResponseEntity<ProductGetResponse> getProduct(
 		@PathVariable Long productId
@@ -61,6 +83,14 @@ public class ProductController {
 		return ResponseEntity.status(HttpStatus.OK).body(productService.getOne(productId));
 	}
 
+	/**
+	 * 특정 상품의 정보를 수정합니다. (관리자 권한 필요)
+	 *
+	 * @param adminInfo 로그인한 관리자 정보
+	 * @param productId 수정할 상품 ID
+	 * @param request   수정할 상품 정보
+	 * @return 수정된 상품 정보와 함께 상태 코드 200 (OK)
+	 */
 	@PatchMapping("/{productId}")
 	public ResponseEntity<ProductUpdateResponse> update(
 		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
@@ -70,6 +100,14 @@ public class ProductController {
 		return ResponseEntity.status(HttpStatus.OK).body(productService.update(adminInfo.getId(), productId, request));
 	}
 
+	/**
+	 * 특정 상품의 재고를 수정합니다. (관리자 권한 필요)
+	 *
+	 * @param adminInfo 로그인한 관리자 정보
+	 * @param productId 재고를 수정할 상품 ID
+	 * @param request   수정할 재고 정보
+	 * @return 수정된 상품 정보와 함께 상태 코드 200 (OK)
+	 */
 	@PatchMapping("/{productId}/stock")
 	public ResponseEntity<ProductUpdateStockResponse> updateStock(
 		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
@@ -79,6 +117,14 @@ public class ProductController {
 		return ResponseEntity.status(HttpStatus.OK).body(productService.updateStock(adminInfo.getId(), productId, request));
 	}
 
+	/**
+	 * 특정 상품의 상태를 수정합니다. (관리자 권한 필요)
+	 *
+	 * @param adminInfo 로그인한 관리자 정보
+	 * @param productId 상태를 수정할 상품 ID
+	 * @param request   새로운 상태 정보
+	 * @return 수정된 상품 정보와 함께 상태 코드 200 (OK)
+	 */
 	@PatchMapping("/{productId}/status")
 	public ResponseEntity<ProductUpdateStatusResponse> updateStatus(
 		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
@@ -88,6 +134,13 @@ public class ProductController {
 		return ResponseEntity.status(HttpStatus.OK).body(productService.updateStatus(adminInfo.getId(), productId, request));
 	}
 
+	/**
+	 * 특정 상품을 삭제합니다. (관리자 권한 필요)
+	 *
+	 * @param adminInfo 로그인한 관리자 정보
+	 * @param productId 삭제할 상품 ID
+	 * @return 상태 코드 204 (No Content)
+	 */
 	@DeleteMapping("/{productId}")
 	public ResponseEntity<Void> delete(
 		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,

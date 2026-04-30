@@ -27,6 +27,9 @@ import com.sparta.backoffice.order.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 주문 관련 API를 처리하는 컨트롤러 클래스
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -34,7 +37,13 @@ public class OrderController {
 
 	private final OrderService orderService;
 
-	// CS 관리자 주문 생성
+	/**
+	 * 관리자가 고객을 대신하여 주문을 생성합니다.
+	 *
+	 * @param adminInfo 로그인한 관리자 정보
+	 * @param request   주문 생성 요청 정보
+	 * @return 생성된 주문 정보와 함께 상태 코드 201 (Created)
+	 */
 	@PostMapping("/admin/orders")
 	public ResponseEntity<OrderCreateResponse> createByAdmin(
 		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
@@ -43,7 +52,12 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createByAdmin(request, adminInfo.getId()));
 	}
 
-	// 고객 주문 생성
+	/**
+	 * 고객이 직접 주문을 생성합니다.
+	 *
+	 * @param request 주문 생성 요청 정보 (customerId 포함)
+	 * @return 생성된 주문 정보와 함께 상태 코드 201 (Created)
+	 */
 	@PostMapping("/customer/orders")
 	public ResponseEntity<OrderCreateResponse> createByCustomer(
 		@Valid @RequestBody OrderCreateRequest request
@@ -52,7 +66,13 @@ public class OrderController {
 			.body(orderService.createByCustomer(request, request.getCustomerId()));
 	}
 
-	// 주문 전체 조회
+	/**
+	 * 주문 목록을 페이징 및 필터링하여 조회합니다. (관리자 권한 필요)
+	 *
+	 * @param adminInfo 로그인한 관리자 정보
+	 * @param request   조회 조건 (페이징, 필터링)
+	 * @return 주문 목록 페이지와 함께 상태 코드 200 (OK)
+	 */
 	@GetMapping("/orders")
 	public ResponseEntity<Page<OrderGetResponse>> getOrders(
 		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
@@ -61,7 +81,13 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.OK).body(orderService.getAll(request));
 	}
 
-	// 주문 상세 조회
+	/**
+	 * 특정 주문의 상세 정보를 조회합니다. (관리자 권한 필요)
+	 *
+	 * @param adminInfo 로그인한 관리자 정보
+	 * @param orderId   조회할 주문 ID
+	 * @return 주문 상세 정보와 함께 상태 코드 200 (OK)
+	 */
 	@GetMapping("/orders/{orderId}")
 	public ResponseEntity<OrderGetResponse> getOrder(
 		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
@@ -70,7 +96,14 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.OK).body(orderService.getOne(orderId));
 	}
 
-	// 주문 상태 수정
+	/**
+	 * 특정 주문의 상태를 수정합니다. (관리자 권한 필요)
+	 *
+	 * @param adminInfo 로그인한 관리자 정보
+	 * @param orderId   상태를 수정할 주문 ID
+	 * @param request   새로운 상태 정보
+	 * @return 수정된 주문 정보와 함께 상태 코드 200 (OK)
+	 */
 	@PatchMapping("/orders/{orderId}/status")
 	public ResponseEntity<OrderStatusUpdateResponse> updateStatus(
 		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
@@ -81,7 +114,14 @@ public class OrderController {
 			.body(orderService.updateStatus(orderId, request));
 	}
 
-	// 주문 취소
+	/**
+	 * 특정 주문을 취소합니다. (관리자 권한 필요)
+	 *
+	 * @param adminInfo 로그인한 관리자 정보
+	 * @param orderId   취소할 주문 ID
+	 * @param request   취소 사유
+	 * @return 상태 코드 204 (No Content)
+	 */
 	@PatchMapping("/orders/{orderId}/cancel")
 	public ResponseEntity<Void> cancelOrder(
 		@SessionAttribute(name = SessionConst.ADMIN_INFO) AdminInfo adminInfo,
