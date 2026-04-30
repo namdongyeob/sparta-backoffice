@@ -18,13 +18,22 @@ import com.sparta.backoffice.customer.repository.CustomerRepository;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 고객 관련 비즈니스 로직을 처리하는 서비스 클래스
+ */
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
 
 	private final CustomerRepository customerRepository;
 
-	//고객 전체 조회
+	/**
+	 * 고객 목록을 페이징 및 필터링하여 조회합니다.
+	 * 각 고객의 총 주문 건수와 총 주문 금액을 함께 조회합니다.
+	 *
+	 * @param request 목록 조회 요청 정보 (페이징, 키워드, 상태 필터)
+	 * @return 고객 정보 목록 페이지
+	 */
 	@Transactional(readOnly = true)
 	public Page<CustomerGetResponse> getAll(CustomerGetRequest request) {
 
@@ -40,7 +49,13 @@ public class CustomerService {
 
 	}
 
-	// 고객 상세 조회
+	/**
+	 * 특정 고객의 상세 정보를 조회합니다.
+	 * 고객의 총 주문 건수와 총 주문 금액을 함께 조회합니다.
+	 *
+	 * @param customerId 조회할 고객의 ID
+	 * @return 고객 상세 정보 응답 객체
+	 */
 	@Transactional(readOnly = true)
 	public CustomerGetOneResponse getOne(Long customerId) {
 		Customer customer = findCustomer(customerId);
@@ -49,7 +64,15 @@ public class CustomerService {
 		return CustomerGetOneResponse.from(customer, totalOrderCount, totalOrderAmount);
 	}
 
-	// 고객 수정
+	/**
+	 * 고객 정보를 수정합니다.
+	 * 이메일 또는 전화번호 변경 시 중복 여부를 확인합니다.
+	 *
+	 * @param customerId 수정할 고객의 ID
+	 * @param request    수정할 고객 정보
+	 * @return 수정된 고객 정보
+	 * @throws CustomException 이메일 또는 전화번호가 중복될 경우
+	 */
 	@Transactional
 	public CustomerUpdateResponse update(Long customerId, CustomerUpdateRequest request) {
 		Customer customer = findCustomer(customerId);
@@ -74,7 +97,13 @@ public class CustomerService {
 		return CustomerUpdateResponse.from(customer);
 	}
 
-	// 고객 상태 변경
+	/**
+	 * 고객의 상태를 변경합니다.
+	 *
+	 * @param customerId 상태를 변경할 고객의 ID
+	 * @param request    새로운 상태 정보
+	 * @return 상태가 변경된 고객 정보
+	 */
 	@Transactional
 	public CustomerStatusUpdateResponse updateStatus(Long customerId, CustomerStatusUpdateRequest request) {
 		Customer customer = findCustomer(customerId);
@@ -86,7 +115,11 @@ public class CustomerService {
 		return CustomerStatusUpdateResponse.from(customer);
 	}
 
-	// 고객 삭제
+	/**
+	 * 고객 정보를 시스템에서 삭제합니다.
+	 *
+	 * @param customerId 삭제할 고객의 ID
+	 */
 	@Transactional
 	public void delete(Long customerId) {
 		Customer customer = findCustomer(customerId);
@@ -94,7 +127,13 @@ public class CustomerService {
 		customerRepository.delete(customer);
 	}
 
-	// 고객 검증
+	/**
+	 * 고객 ID로 엔티티를 조회합니다.
+	 *
+	 * @param customerId 조회할 고객의 ID
+	 * @return 고객 엔티티
+	 * @throws CustomException 고객을 찾을 수 없는 경우
+	 */
 	public Customer findCustomer(Long customerId) {
 		return customerRepository.findById(customerId).orElseThrow(
 			() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND)

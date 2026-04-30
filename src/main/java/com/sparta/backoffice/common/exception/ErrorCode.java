@@ -5,6 +5,10 @@ import org.springframework.http.HttpStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 애플리케이션 전반에서 발생하는 예외의 코드와 메시지를 정의하는 열거형입니다.
+ * 각각의 에러 코드는 HTTP 상태 코드와 사용자에게 표시될 메시지를 포함합니다.
+ */
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
@@ -55,6 +59,13 @@ public enum ErrorCode {
 	// 클라이언트 입력값 검증 오류 (@Valid, @Validated)
 	VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "입력 값이 올바르지 않습니다.");
 
+	/**
+	 * 발생한 예외에 해당하는 HTTP 상태 코드
+	 */
 	private final HttpStatus status;
+
+	/**
+	 * 발생한 예외에 대한 설명 메시지
+	 */
 	private final String message;
 }

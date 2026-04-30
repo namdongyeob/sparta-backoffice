@@ -1,7 +1,5 @@
 package com.sparta.backoffice.order.repository;
 
-import java.time.LocalDateTime;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,6 +23,4 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 		@Param("status") OrderStatus status,
 		Pageable pageable
 	);
-
-	long countByCreatedAtBetween(LocalDateTime localDateTime, LocalDateTime localDateTime1);
 }

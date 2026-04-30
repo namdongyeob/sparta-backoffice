@@ -17,13 +17,23 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 관리자 인증 관련 API를 처리하는 컨트롤러 클래스
+ */
 @RestController
 @RequestMapping("/api/admins")
 @RequiredArgsConstructor
 public class AuthController {
 	private final AdminService adminService;
 
-	// 관리자 로그인
+	/**
+	 * 관리자 로그인을 처리합니다.
+	 * 성공 시 세션에 관리자 정보를 저장합니다.
+	 *
+	 * @param request 로그인 요청 정보
+	 * @param session HTTP 세션 객체
+	 * @return 상태 코드 204 (No Content)
+	 */
 	@PostMapping("/login")
 	public ResponseEntity<Void> login(@Valid @RequestBody AdminLoginRequest request, HttpSession session) {
 		Admin admin = adminService.login(request);
@@ -35,7 +45,13 @@ public class AuthController {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
-	// 관리자 로그아웃
+	/**
+	 * 관리자 로그아웃을 처리합니다.
+	 * 현재 세션을 무효화합니다.
+	 *
+	 * @param session HTTP 세션 객체
+	 * @return 상태 코드 204 (No Content)
+	 */
 	@PostMapping("/logout")
 	public ResponseEntity<Void> logout(HttpSession session) {
 		session.invalidate();
