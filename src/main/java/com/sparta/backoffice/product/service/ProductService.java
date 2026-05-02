@@ -1,5 +1,9 @@
 package com.sparta.backoffice.product.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +23,11 @@ import com.sparta.backoffice.product.dto.ProductUpdateStatusRequest;
 import com.sparta.backoffice.product.dto.ProductUpdateStatusResponse;
 import com.sparta.backoffice.product.dto.ProductUpdateStockRequest;
 import com.sparta.backoffice.product.dto.ProductUpdateStockResponse;
+import com.sparta.backoffice.product.dto.ReviewSummaryResponse;
 import com.sparta.backoffice.product.entity.Product;
 import com.sparta.backoffice.product.repository.ProductRepository;
+import com.sparta.backoffice.review.entity.Review;
+import com.sparta.backoffice.review.repository.ReviewRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +40,7 @@ public class ProductService {
 
 	private final ProductRepository productRepository;
 	private final AdminRepository adminRepository;
+	private final ReviewRepository reviewRepository;
 
 	/**
 	 * 새로운 상품을 생성합니다.
@@ -80,8 +88,19 @@ public class ProductService {
 	@Transactional(readOnly = true)
 	public ProductGetResponse getOne(Long productId) {
 		Product product = findProduct(productId);
-
-		return ProductGetResponse.from(product);
+		List<Review> reviews = reviewRepository.findAllByProductId(productId);
+		double averageRating = reviews.stream()  // 리뷰 목록을 스트림으로
+			.mapToInt(Review::getRating)         // 각 리뷰에서 평점만 뽑기
+			.average()                           // 평균 계산
+			.orElse(0.0);                  // 리뷰가 없으면 0.0 반환
+		long totalReviewCount = reviews.size();
+		Map<Integer, Long> ratingCounts = reviews.stream()
+			.collect(Collectors.groupingBy(Review::getRating, Collectors.counting()));
+		List<ReviewSummaryResponse> recentReviews = reviewRepository.findTop3ByProductId(productId)
+			.stream()
+			.map(ReviewSummaryResponse::from)
+			.toList();
+		return ProductGetResponse.from(product,averageRating,totalReviewCount,ratingCounts,recentReviews);
 	}
 
 	/**
