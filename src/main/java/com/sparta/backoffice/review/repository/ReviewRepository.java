@@ -1,5 +1,7 @@
 package com.sparta.backoffice.review.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,4 +23,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 		@Param("rating") Integer rating,
 		Pageable pageable
 	);
+	// 특정 상품의 모든 리뷰
+	@EntityGraph(attributePaths = {"customer"})
+	@Query("SELECT r FROM Review r WHERE r.product.id = :productId")
+	List<Review> findAllByProductId(@Param("productId") Long productId);
+	// 최신 리뷰 3개
+	@EntityGraph(attributePaths = {"customer"})
+	@Query("SELECT r FROM Review r WHERE r.product.id = :productId ORDER BY r.createdAt DESC LIMIT 3")
+	List<Review> findTop3ByProductId(@Param("productId") Long productId);
 }
