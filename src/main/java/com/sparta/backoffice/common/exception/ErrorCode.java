@@ -27,6 +27,7 @@ public enum ErrorCode {
 	ADMIN_LOGIN_NOT_ALLOWED(HttpStatus.FORBIDDEN, "로그인할 수 없는 계정입니다."),
 	ADMIN_ACCESS_DENIED(HttpStatus.FORBIDDEN, "슈퍼 관리자만 접근 가능합니다."),
 	ADMIN_INVALID_STATUS(HttpStatus.FORBIDDEN, "승인 대기 중인 관리자만 승인 또는 거절할 수 있습니다."),
+	ADMIN_SELF_ROLE_CHANGE_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "본인의 역할은 변경할수 없습니다." ),
 
 	// 상품 관련
 	PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다."),

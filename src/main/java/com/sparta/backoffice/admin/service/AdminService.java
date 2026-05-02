@@ -210,6 +210,9 @@ public class AdminService {
 	@Transactional
 	public AdminRoleUpdateResponse updateAdminRole(AdminInfo adminInfo, Long adminId, AdminRoleUpdateRequest request) {
 		validateSuperAdmin(adminInfo);
+		if (adminInfo.getId().equals(adminId)) {
+			throw new CustomException(ErrorCode.ADMIN_SELF_ROLE_CHANGE_NOT_ALLOWED);
+		}
 		Admin admin = findAdmin(adminId);
 		admin.updateRole(request.getRole());
 		return AdminRoleUpdateResponse.from(admin);
